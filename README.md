@@ -19,11 +19,14 @@
 | *F<sub>xi</sub>* | Tire longitudinal velocity | N |
 | *l<sub>w1</sub>* | Front track width | m |
 | *l<sub>w2</sub>* | Rear track width | m |
+| *l<sub>r</sub>* | Distance from rear axle to CoG | m |
+| *l<sub>f</sub>* | Distance from front axle to CoG | m |
 | *R<sub>w</sub>* | Effective tire radius | m |
 | *F<sub>ri</sub>* | Tire rolling resistance force | N |
 | *V<sub>xi</sub>* | Wheel longitudinal velocity | m/s |
 | *V<sub>wi</sub>* | Wheel center of gravity velocity | m/s |
 | *α<sub>i</sub>* | Wheel side slip angle | rad |
+| *β* | Vehicle side slip angle | rad |
 | *V<sub>x</sub>* | Vehicle longitudinal velocity | m/s |
 | *V<sub>y</sub>* | Vehicle lateral velocity | m/s |
 | *λ<sub>i</sub>* | Wheel slip ratio | - |
