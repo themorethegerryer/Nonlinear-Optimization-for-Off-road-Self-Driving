@@ -5,7 +5,7 @@
 (Source: ["Yaw Stability Control System Development and Implementation for a Fully Electric Vehicle"](https://arxiv.org/ftp/arxiv/papers/2012/2012.04719.pdf#:~:text=The%20double%20track%20model%20is,model%20with%20all%20four%20wheels.))
 
 
-![alt text](https://github.com/themorethegerryer/Nonlinear-Optimization-for-Off-road-Self-Driving/blob/main/double_track_model_graphic.PNG?raw=true)
+![alt text](https://github.com/themorethegerryer/Nonlinear-Optimization-for-Off-road-Self-Driving/blob/main/media/double_track_model_graphic.PNG?raw=true)
 
 | Symbol | Definition | Unit |
 |--------|------------|------|
