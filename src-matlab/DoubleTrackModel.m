@@ -1,15 +1,19 @@
 classdef DoubleTrackModel
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    % Model dynamics for the double track model for the purpose of off-road
+    % autonomous driving
     
     properties
-        Property1
+        lw = 1.8    % width of car (distance b/w center of tires)
+        lr = 2.25   % distance from rear to center of mass
+        lf = 2.25   % distance from front to center of mass
+        Rw = 0.23   % effective tire radius
+        c = 0.04    % rolling friction coefficient
+        
     end
     
     methods
-        function obj = untitled(inputArg1,inputArg2)
-            %UNTITLED Construct an instance of this class
-            %   Detailed explanation goes here
+        function obj = DoubleTrackModel()
+            % Double Track Model Constructor
             obj.Property1 = inputArg1 + inputArg2;
         end
         
