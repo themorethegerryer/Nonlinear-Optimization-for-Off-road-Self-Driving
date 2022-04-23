@@ -50,3 +50,40 @@ Control: U
 | Steering Angle | θ | 0 |
 | Wheel Torque (All wheel drive) | 𝜏 | 1 |
 
+### Terrain Creation
+# https://www.youtube.com/watch?v=a1kxPd8Mdhw
+#
+# Install Requirements
+# conda create --prefix ./env numpy pyopengl
+# conda create --prefix ./env2 pytorch numpy pyopengl anaconda pyqt
+#       conda install pyqtgraph
+# conda create --prefix ./env3 numpy pytorch pyopengl pyqtgraph anaconda pyqt 
+# Or
+# conda install python=3.4
+# conda install -c anaconda pyopengl
+# conda install numpy
+# conda install pyqtgraph
+# conda install -c anaconda pyqt
+# conda install PyQt5
+# conda install -c dsdale24 pyqt5
+# IT'S ALL A LIE, NONE OF IT WORKS
+# conda create --prefix ./env
+#       pip install pyqtgraph
+#       If you get a numpy error
+#           pip uninstall -y numpy
+#           pip uninstall -y setuptools
+#           pip install setuptools
+#           pip install numpy
+#       pip install pyopengl
+#       pip install pyqtgraph
+#       pip install pyqt5
+
+# Plotly install
+# conda create --prefix ./envPlotly numpy pytorch plotly scipy -c plotly plotly
+
+# PyOpenGl Tutorial:
+# https://www.youtube.com/watch?v=LqPPvPKUfV4&list=PL1P11yPQAo7opIg8r-4BMfh1Z_dCOfI0y&index=1
+# pip install glfw      # 1.8.3
+# pip install pyopengl  # 3.1.0
+# pip install pyrr      # 0.10.3
+# pip install pillow    # 6.1.0

@@ -109,6 +109,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+envPlotly/
+envTutorial/
 
 # Spyder project settings
 .spyderproject
