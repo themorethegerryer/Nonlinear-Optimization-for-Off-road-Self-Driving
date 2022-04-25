@@ -124,8 +124,8 @@ classdef DoubleTrackModel
 %             bcdVal = (b3*(Fz^2) + b4*Fz)*exp(-b5*Fz);
 %             B = bcdVal / (C*D);
 %             E = (b6*(Fz^2) + b7*Fz + b8);
-            Sh = b9*Fz + b10;
-            Sv = b11*Fz + b12;
+%             Sh = b9*Fz + b10;
+%             Sv = b11*Fz + b12;
             % constant values from Matlab documentation
             % https://www.mathworks.com/help/physmod/sdl/ref/tireroadinteractionmagicformula.html
             B = 10;
@@ -134,15 +134,16 @@ classdef DoubleTrackModel
             E = 0.97;
 
             % compute Fx and Fy
-            Fwheel.Fx = Fz*D*sin(C*atan(B*longSlip));
+            Fwheel.Fx = Fz*D*sin(C*atan(B*longSlip - E*(B*longSlip - atan(B*longSlip))));
 %             Fwheel.Fx = D*sin(C*atan(B*(longSlip + Sh) - E*(B*(longSlip + Sh) - atan(B*(longSlip + Sh))))) + Sv;
 %             Fwheel.Fx = Fwheel.Fx/1e3;
             % Fx = D*sin(C*atan(B*(longSlip + Sh) - E*(B*(longSlip + Sh) -
             % atan(B*(longSlip + Sh))))) + Sv;
 
-            Fwheel.Fy = D*sin(C*atan(B*(sideSlip + Sh) - E*(B*(sideSlip + Sh) - atan(B*(sideSlip + Sh))))) + Sv;
+            Fwheel.Fy = Fz*D*sin(C*atan(B*sideSlip - E*(B*sideSlip - atan(B*sideSlip))));
+%             Fwheel.Fy = D*sin(C*atan(B*(sideSlip + Sh) - E*(B*(sideSlip + Sh) - atan(B*(sideSlip + Sh))))) + Sv;
 %             Fwheel.Fy = Fwheel.Fy/1e3;
-            disp(Fwheel)
+%             disp(Fwheel)
         end
         
         function slip = slip_function(car, X,U)
@@ -152,10 +153,10 @@ classdef DoubleTrackModel
             Vy = X(5);
             theta = ackermann_turn(car, U(1));
             
-            sideSlip_fl = theta.left - atan2(Vx - (car.lw/2)*r, Vy + car.lf*r);
-            sideSlip_fr = theta.right - atan2(Vx + (car.lw/2)*r, Vy + car.lf*r);
-            sideSlip_rl = -atan2(Vx-(car.lw/2)*r, Vy - car.lr*r);
-            sideSlip_rr = -atan2(Vx+(car.lw/2)*r, Vy - car.lr*r);
+            sideSlip_fl = theta.left - atan((Vy + car.lf*r)/(Vx - (car.lw/2)*r));
+            sideSlip_fr = theta.right - atan(, (Vy + car.lf*r)/(Vx + (car.lw/2)*r));
+            sideSlip_rl = -atan(Vx-(car.lw/2)*r, Vy - car.lr*r);
+            sideSlip_rr = -atan(Vx+(car.lw/2)*r, Vy - car.lr*r);
 
             sideSlip = [sideSlip_fl sideSlip_fr sideSlip_rl sideSlip_rr];
             sideSlip(isnan(sideSlip)) = 0;
@@ -205,7 +206,7 @@ classdef DoubleTrackModel
             longSlip = [lambda_fl lambda_fr lambda_rl lambda_rr];
             longSlip(isnan(longSlip)) = 0;
             slip.long_slip = longSlip;
-%             disp(slip);
+            disp(slip);
         end
         
         function theta = ackermann_turn(car, steering_angle)
