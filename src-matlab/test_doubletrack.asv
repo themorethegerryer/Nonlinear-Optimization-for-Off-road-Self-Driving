@@ -35,10 +35,9 @@ for i=1:length(t)
     xVect = [xVect ; X_n_1];
 end
 
-X_init = [0 0 0.1 2 2 100 100 100 100];
+X_init = [0 0 0 2 2 10 10 10 10];
 
-jac = double_track_car.discrete_jacobian(X_init, U_init,0.01);
-% jac = numeric_jacobian(double_track_car,X_init,U_init, 0.01);
+jac = numeric_jacobian(double_track_car,X_init,U_init, 0.01);
 
 % xVect(end,:)
 

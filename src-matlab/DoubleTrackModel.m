@@ -48,7 +48,7 @@ classdef DoubleTrackModel
         
         function dxdt = continuous_dynamics(car, state, controls)% ax, ay, rdot, wdot
             % state = [x y r xdot ydot wfl wfr wrl wrr]
-            % rdot xdotdot ydotdot wfldot wfrdot wrldot wrrdot]
+            % dxdt = [xdot ydot rdot xdotdot ydotdot wfldot wfrdot wrldot wrrdot]
             
             % TODO: assume Fz is equal across all wheels
             Fz = car.m*9.81/4;
@@ -73,13 +73,55 @@ classdef DoubleTrackModel
             dxdt(9) = (1/car.Iwheel)*(controls(2) - roll_frict_force);
         end
         
-        function X_n_1 = dynamics_rk4(car,X,U,dt)
-            f1 = continuous_dynamics(car, X, U);
-            f2 = continuous_dynamics(car, X + 0.5*dt*f1, U);
-            f3 = continuous_dynamics(car, X + 0.5*dt*f2, U);
-            f4 = continuous_dynamics(car, X + dt*f3, U);
+        function X_n_1 = dynamics_rk4(car,X,U, dt)
+            uTemp = U;
+%             uTemp(1) = uTemp(1) + 0.1*timeVal;
+%             if timeVal > 1.0
+%                uTemp(1) = 0.1; 
+%             end
+            f1 = continuous_dynamics(car, X, uTemp);
+            f2 = continuous_dynamics(car, X + 0.5*dt*f1, uTemp);
+            f3 = continuous_dynamics(car, X + 0.5*dt*f2, uTemp);
+            f4 = continuous_dynamics(car, X + dt*f3, uTemp);
             
             X_n_1 = X + (dt / 6)*(f1 + 2*f2 + 2*f3 + f4);
+        end
+        
+        function jac = discrete_jacobian(car, x, u, epsilon)
+            % Calculate Jacobian of function f at given x
+            % Standard finite forward difference method
+            %
+            % Inputs:
+            %   f can be a vector of function, but make sure it is a row vector
+            %   x is where the jacobian is being evaluated, it a row or column vector 
+            %   epsilon is a very small number
+            if nargin < 3
+                epsilon = 1e-5; 
+            end
+            epsilon_inv = 1/(epsilon); % (1 / (2*epsilon))
+            nx = length(x); % Dimension of the input x;
+            % f0 = feval(f, x); % caclulate f0, when no perturbation happens
+            f0 = car.continuous_dynamics(x,u);
+            jac.A = zeros(length(f0), nx);
+            % Do perturbation
+            for i = 1 : nx
+                xplus = x;
+            %     xminus = x;
+                xplus(i) =  x(i) + epsilon;
+            %     xminus(i) = x(i) - epsilon;
+                jac.A(:, i) = (car.continuous_dynamics(xplus,u) - f0) .* epsilon_inv;
+            end
+
+            jac.B = zeros(length(f0), length(u));
+
+            for i = 1 : length(u)
+                uplus = u;
+            %     uminus = u;
+                uplus(i) =  u(i) + epsilon;
+            %     uminus(i) = u(i) - epsilon;
+                jac.B(:,i) = (car.continuous_dynamics(x,uplus) - f0) .* epsilon_inv;
+            end
+
         end
         
 %         function dynamics(car,X,U,dt) % output: X_n+1
