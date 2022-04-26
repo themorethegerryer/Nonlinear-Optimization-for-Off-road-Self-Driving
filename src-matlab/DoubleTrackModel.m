@@ -267,7 +267,7 @@ classdef DoubleTrackModel
             % set NaN values to zero (i.e. vechile is not moving)
             longSlip(isnan(longSlip)) = 0;
             slip.long_slip = longSlip;
-            disp(slip);
+%             disp(slip);
         end
         
         function theta = ackermann_turn(car, steering_angle)
