@@ -228,29 +228,28 @@ classdef DoubleTrackModel
             if (w_fl*car.Rw - Vx_fl) < 0
                 lambda_fl = (w_fl*car.Rw - Vx_fl) / Vx_fl;
             else
-                lambda_fl = (w_fl*car.Rw - Vx_fl) / (w_fl*car.Rw);
+                lambda_fl = (w_fl*car.Rw - Vx_fl) / w_fl*car.Rw;
             end
 
             if (w_fr*car.Rw - Vx_fr) < 0
                 lambda_fr = (w_fr*car.Rw - Vx_fr) / Vx_fr;
             else
-                lambda_fr = (w_fr*car.Rw - Vx_fr) / (w_fr*car.Rw);
+                lambda_fr = (w_fr*car.Rw - Vx_fr) / w_fr*car.Rw;
             end
 
             if (w_rl*car.Rw - Vx_rl) < 0
                 lambda_rl = (w_rl*car.Rw - Vx_rl) / Vx_rl;
             else
-                lambda_rl = (w_rl*car.Rw - Vx_rl) / (w_rl*car.Rw);
+                lambda_rl = (w_rl*car.Rw - Vx_rl) / w_rl*car.Rw;
             end
 
             if (w_rr*car.Rw - Vx_rr) < 0
                 lambda_rr = (w_rr*car.Rw - Vx_rr) / Vx_rr;
             else
-                lambda_rr = (w_rr*car.Rw - Vx_rr) / (w_rr*car.Rw);
+                lambda_rr = (w_rr*car.Rw - Vx_rr) / w_rr*car.Rw;
             end
 
             longSlip = [lambda_fl lambda_fr lambda_rl lambda_rr];
-            % set NaN values to zero (i.e. vechile is not moving)
             longSlip(isnan(longSlip)) = 0;
             slip.long_slip = longSlip;
         end

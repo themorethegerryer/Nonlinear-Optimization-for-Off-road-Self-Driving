@@ -37,7 +37,7 @@ end
 
 X_init = [0 0 0.1 2 2 100 100 100 100];
 
-jac = double_track_car.discrete_jacobian(X_init, U_init,0.01);
+jac = double_track_car.discrete_jacobian(X_init, U_init);
 % jac = numeric_jacobian(double_track_car,X_init,U_init, 0.01);
 
 % xVect(end,:)
