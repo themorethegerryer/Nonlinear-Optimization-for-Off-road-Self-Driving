@@ -140,11 +140,15 @@ CarBRWheel_geo.radius = tire_radius;
 % Save Generated Terrain, Simulation, and Parameters
 save(myworld, get(myworld, 'FileName'))
 save('TerrainData.mat','data_map')
-
-
-
-
-
-
-
-
+init_parameters = struct;
+init_parameters.BodyRotation = CarBody_node.rotation;
+init_parameters.BodyTranslation = CarBody_node.translation;
+init_parameters.FLWheelRotation = CarFLWheel_node.rotation;
+init_parameters.FLWheelTranslation = CarFLWheel_node.translation;
+init_parameters.FRWheelRotation = CarFRWheel_node.rotation;
+init_parameters.FRWheelTranslation = CarFRWheel_node.translation;
+init_parameters.BLWheelRotation = CarBLWheel_node.rotation;
+init_parameters.BLWheelTranslation = CarBLWheel_node.translation;
+init_parameters.BRWheelRotation = CarBRWheel_node.rotation;
+init_parameters.BRWheelTranslation = CarBRWheel_node.translation;
+save('init_parameters.mat', 'init_parameters')
