@@ -1,7 +1,8 @@
+clc
 clear all
 % MPC
 % x = [x y r xdot ydot wfl wfr wrl wrr]
-% u = [theta_steer torque]
+% u = [theta_steer torque brake]
 % Defined constraints:
 %   U: 
 %       0: steering angle +/- 45 deg = pi/4 rad
@@ -9,12 +10,12 @@ clear all
 %   X:
 %       None?
 
-Nmpc = 30; %MPC Horizon
+Nmpc = 10; %MPC Horizon
 x0 = [0; 0; 0; 0; 0; 0; 0; 0; 0]; %Initial State
-xf = [161.934; 0; 0; 0; 0; 5; 5; 5; 5]; %Final State
+xf = [161.934; 0; 0; 0; 0; 0; 0; 0; 0]; %Final State
 % xf(1) = 161.934; % = 0.1 miles
 max_velocity = 15; % = 33.554mph
-dt = 0.1;
+dt = 1;
 
 % Create double track model
 model = DoubleTrackModel();
@@ -27,13 +28,13 @@ m = length(Uref(:,1));
 N = length(times);
 
 % Define constraints
-umin = [-pi/4; -300];
-umax = [pi/4; 300];
+umin = [-pi/4; 0; 0];
+umax = [pi/4; 300; 150];
 
 % Define LQR costs... but for MPC
 Q = diag([10 10 10 1 1 0 0 0 0]);
-R = diag([0.1 0.1]);
-Qf = Q*10;
+R = diag([0.1 0.1 0.1]);
+Qf = Q;
 
 % Get A, B matrices (time-varying)
 A = zeros(n,n,N-1);
@@ -68,11 +69,11 @@ end
 U = kron(eye(Nmpc-1), [eye(m) zeros(m,n)]);
 C = [D;U];
 
-lb_Uref = zeros(Nmpc-1,2);
-ub_Uref = zeros(Nmpc-1,2);
+lb_Uref = zeros(3,Nmpc-1);
+ub_Uref = zeros(3,Nmpc-1);
 for k = 1:Nmpc-1
-    lb_Uref(k,:) = umin - Uref(:,k);
-    ub_Uref(k,:) = umax - Uref(:,k);
+    lb_Uref(:,k) = umin - Uref(:,k);
+    ub_Uref(:,k) = umax - Uref(:,k);
 end
 lb = [zeros(n*(Nmpc-1),1); reshape(lb_Uref',1,[])'];
 ub = [zeros(n*(Nmpc-1),1); reshape(ub_Uref',1,[])'];
@@ -95,7 +96,7 @@ for k = 1:length(times)-2
     end
 
     % Apply first control input to the plant
-    ctrl = res.x(12:13);
+    ctrl = res.x(n+m+1:n+m+m);
     disp(ctrl)
     x = A(:,:,k+1)*x + B(:,:,k+1)*ctrl;
     
@@ -104,3 +105,5 @@ for k = 1:length(times)-2
     ub(1:n) = -x;
     mpc.update('l', lb, 'u', ub);
 end
+disp("Final State")
+disp(x)
