@@ -1,0 +1,33 @@
+% MPC
+% Defined constraints:
+%   U: 
+%       0: steering angle +/- 45 deg = pi/4 rad
+%       1: torque limit 300 Nm
+%   X:
+%       None?
+% Create double track model
+model = DoubleTrackModel();
+
+% Create reference trajectory
+% x = [x y r xdot ydot wfl wfr wrl wrr]
+% u = [theta_steer torque]
+x0 = zeros(9,1);
+xf = zeros(9,1);
+xf(1) = 160.934; % = 0.1 miles
+max_velocity = 15; % = 33.554mph
+[Xref, Uref, times] = genRefTraj_simplified(x0, xf, 1, 0.1);
+
+n = length(Xref(:,1));
+m = length(Uref(:,1));
+
+% Define LQR costs... but for MPC
+Q = eye(length(x0));
+R = [1 0; 0 1];
+Qf = Q;
+
+% Get A, B mat
+% jac = model.discrete_jacobian();
+A = eye(length(x0));
+B = eye(length(x0),2);
+
+mpc = OSQPController(n, m, Nmpc, length(Xref), Nd)
