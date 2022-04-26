@@ -12,6 +12,7 @@ classdef DoubleTrackModel
         h_CoM = 0.5 % height of car's center of mass (m)  
         Rw = 0.23   % effective tire radius (m)
         c = 0.04    % rolling friction coefficient
+        w_wheel = 0.3 % width of tire (m) (i.e. average is 12.5 inches)
         
         length
         Iz
@@ -31,6 +32,7 @@ classdef DoubleTrackModel
                 car.lf = 2.25;
                 car.Rw = 0.23;
                 car.c = 0.04;
+                car.w_wheel = 0.3;
             else
                 car.m = m;
                 car.mw = mw;
@@ -39,6 +41,7 @@ classdef DoubleTrackModel
                 car.lf = lf;
                 car.Rw = Rw;
                 car.c = c;
+                car.w_wheel = 0.3;
             end
             car.length = car.lr+car.lf;
             car.Iz = (car.m)*(car.length^2 + car.lw^2)/12;
@@ -52,7 +55,16 @@ classdef DoubleTrackModel
             
             % TODO: assume Fz is equal across all wheels
             Fz = car.m*9.81/4;
-            roll_frict_force = car.c*Fz*car.Rw;
+            if state(4) > 0
+                brake_force = controls(3);
+                roll_frict_force = min(car.c*Fz*car.Rw, controls(2));
+            elseif state(4) < 0
+                brake_force = -controls(3);
+                roll_frict_force = max(-car.c*Fz*car.Rw, controls(2));
+            else
+                brake_force = 0;
+                roll_frict_force = 0;
+            end
             
             theta = ackermann_turn(car, controls(1));
             slip = slip_function(car, state, controls(1));
@@ -73,13 +85,13 @@ classdef DoubleTrackModel
             % ydotdot
             dxdt(5) = (1/car.m)*(Fwheel_fl.Fy*cos(theta.left) + Fwheel_fr.Fy*cos(theta.right) + Fwheel_rl.Fy + Fwheel_rr.Fy + Fwheel_fl.Fx*sin(theta.left) + Fwheel_fr.Fx*sin(theta.right));
             % w_fl
-            dxdt(6) = (1/car.Iwheel)*(controls(2) - roll_frict_force);
+            dxdt(6) = (1/car.Iwheel)*(controls(2) - brake_force - roll_frict_force);
             % w_fr
-            dxdt(7) = (1/car.Iwheel)*(controls(2) - roll_frict_force);
+            dxdt(7) = (1/car.Iwheel)*(controls(2) - brake_force - roll_frict_force);
             % w_rl
-            dxdt(8) = (1/car.Iwheel)*(controls(2) - roll_frict_force);
+            dxdt(8) = (1/car.Iwheel)*(controls(2) - brake_force - roll_frict_force);
             % w_rr
-            dxdt(9) = (1/car.Iwheel)*(controls(2) - roll_frict_force);
+            dxdt(9) = (1/car.Iwheel)*(controls(2) - brake_force - roll_frict_force);
         end
         
         function X_n_1 = dynamics_rk4(car,X,U, dt)
@@ -192,6 +204,7 @@ classdef DoubleTrackModel
             Fwheel.Fx = Fz*D*sin(C*atan(B*longSlip - E*(B*longSlip - atan(B*longSlip))));
 
             Fwheel.Fy = Fz*D*sin(C*atan(B*sideSlip - E*(B*sideSlip - atan(B*sideSlip))));
+%             disp(Fwheel);
         end
         
         function slip = slip_function(car, X,U)
@@ -253,6 +266,7 @@ classdef DoubleTrackModel
             % set NaN values to zero (i.e. vechile is not moving)
             longSlip(isnan(longSlip)) = 0;
             slip.long_slip = longSlip;
+            disp(slip);
         end
         
         function theta = ackermann_turn(car, steering_angle)

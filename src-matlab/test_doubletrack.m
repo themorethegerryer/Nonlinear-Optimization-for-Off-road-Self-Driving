@@ -6,7 +6,7 @@ clc;
 X_init = [0 0 0 0 0 10 10 10 10];
 
 % define sample control input
-U_init = [0.1 100];
+U_init = [0.0 100 100];
 
 % declare double_track_car class
 m = 2000;    % mass of the car (kg)
@@ -35,13 +35,13 @@ for i=1:length(t)
     xVect = [xVect ; X_n_1];
 end
 
-X_init = [0 0 0.1 2 2 100 100 100 100];
-
-jac = double_track_car.discrete_jacobian(X_init, U_init);
+% X_init = [0 0 0.1 2 2 100 100 100 100];
+% 
+% jac = double_track_car.discrete_jacobian(X_init, U_init);
 % jac = numeric_jacobian(double_track_car,X_init,U_init, 0.01);
 
 % xVect(end,:)
 
 % plot
-% plot(xVect(:,1),xVect(:,2))
-% ylim([-1 1])
+plot(xVect(:,1),xVect(:,2))
+ylim([-1 1])
