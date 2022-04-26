@@ -238,9 +238,10 @@ classdef DoubleTrackModel
             Vx_rr = Vx;
 
             % compute longSlip for each wheel
-            if (w_fl*car.Rw - Vx_fl) < 0
+            
+            if (w_fl*car.Rw - Vx_fl) < 0 % breaking case
                 lambda_fl = (w_fl*car.Rw - Vx_fl) / Vx_fl;
-            else
+            else % forward accel case
                 lambda_fl = (w_fl*car.Rw - Vx_fl) / (w_fl*car.Rw);
             end
 

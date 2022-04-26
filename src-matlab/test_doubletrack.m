@@ -3,10 +3,13 @@ clear all;
 clc;
 
 % define sample state
-X_init = [0 0 0 0 0 10 10 10 10];
+X_init = [0 0 0 4 0 811 811 811 811];
 
 % define sample control input
-U_init = [0.0 100 100];
+U_init = [0.0 0 150];
+
+% accelerator between 0 and 70
+% brake between 0 and 150
 
 % declare double_track_car class
 m = 2000;    % mass of the car (kg)
@@ -40,7 +43,7 @@ end
 % jac = double_track_car.discrete_jacobian(X_init, U_init);
 % jac = numeric_jacobian(double_track_car,X_init,U_init, 0.01);
 
-% xVect(end,:)
+xVect(end,:)
 
 % plot
 plot(xVect(:,1),xVect(:,2))
