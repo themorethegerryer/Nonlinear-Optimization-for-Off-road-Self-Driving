@@ -3,10 +3,10 @@ clear all;
 clc;
 
 % define sample state
-X_init = [0 0 0 4 0 811 811 811 811];
+X_init = [0 0 0 0 0 0 0 0 0];
 
 % define sample control input
-U_init = [0.0 0 150];
+U_init = [0 0 100];
 
 % accelerator between 0 and 70
 % brake between 0 and 150
@@ -25,7 +25,7 @@ double_track_car = DoubleTrackModel(m, mw, lw, lr, lf, Rw, c);
 
 % step through dynamics 
 dt = 0.1;
-t = 0:dt:2;
+t = 0:dt:5;
 xVect = [X_init];
 
 for i=1:length(t)
@@ -47,4 +47,4 @@ xVect(end,:)
 
 % plot
 plot(xVect(:,1),xVect(:,2))
-ylim([-1 1])
+ylim([-2 2])

@@ -55,16 +55,18 @@ classdef DoubleTrackModel
             
             % TODO: assume Fz is equal across all wheels
             Fz = car.m*9.81/4;
-            if state(4) > 0
-                brake_force = controls(3);
-                roll_frict_force = min(car.c*Fz*car.Rw, controls(2));
-            elseif state(4) < 0
-                brake_force = -controls(3);
-                roll_frict_force = max(-car.c*Fz*car.Rw, controls(2));
-            else
-                brake_force = 0;
-                roll_frict_force = 0;
-            end
+            brake_force = controls(3);
+            roll_frict_force = 0;
+%             if state(4) > 0
+% %                 brake_force = controls(3);
+%                 roll_frict_force = min(car.c*Fz*car.Rw, controls(2));
+%             elseif state(4) < 0
+% %                 brake_force = -controls(3);
+%                 roll_frict_force = max(-car.c*Fz*car.Rw, controls(2));
+%             else
+% %                 brake_force = 0;
+%                 roll_frict_force = 0;
+%             end
             
             theta = ackermann_turn(car, controls(1));
             slip = slip_function(car, state, controls(1));
@@ -106,6 +108,7 @@ classdef DoubleTrackModel
             f4 = continuous_dynamics(car, X + dt*f3, uTemp);
             
             X_n_1 = X + (dt / 6)*(f1 + 2*f2 + 2*f3 + f4);
+            X_n_1(isnan(X_n_1)) = 0;
         end
         
         function jac = discrete_jacobian(car, x, u)
@@ -216,10 +219,10 @@ classdef DoubleTrackModel
             theta = ackermann_turn(car, U(1));
             
             % compute sideSlip for each wheel
-            sideSlip_fl = theta.left - atan((Vy + car.lf*r)/(Vx - (car.lw/2)*r));
-            sideSlip_fr = theta.right - atan((Vy + car.lf*r)/(Vx + (car.lw/2)*r));
-            sideSlip_rl = -atan((Vy - car.lr*r)/(Vx-(car.lw/2)*r));
-            sideSlip_rr = -atan((Vy - car.lr*r)/(Vx+(car.lw/2)*r));
+            sideSlip_fl = theta.left - atan((Vy + car.lf*r)/abs(Vx - (car.lw/2)*r));
+            sideSlip_fr = theta.right - atan((Vy + car.lf*r)/abs(Vx + (car.lw/2)*r));
+            sideSlip_rl = -atan((Vy - car.lr*r)/abs(Vx-(car.lw/2)*r));
+            sideSlip_rr = -atan((Vy - car.lr*r)/abs(Vx+(car.lw/2)*r));
 
             sideSlip = [sideSlip_fl sideSlip_fr sideSlip_rl sideSlip_rr];
             % set NaN values to zero (i.e. car moving foward)
@@ -232,8 +235,10 @@ classdef DoubleTrackModel
             w_rr = X(9);
             
             % compute longitudinal wheel velocity
-            Vx_fl = Vx*cos(theta.left);
-            Vx_fr = Vx*cos(theta.right);
+%             Vx_fl = Vx*cos(theta.left);
+            Vx_fl = Vx;
+%             Vx_fr = Vx*cos(theta.right);
+            Vx_fr = Vx;
             Vx_rl = Vx;
             Vx_rr = Vx;
 
