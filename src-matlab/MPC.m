@@ -15,7 +15,7 @@ x0 = [0; 0; 0; 0; 0; 0; 0; 0; 0]; %Initial State
 xf = [161.934; 0; 0; 0; 0; 0; 0; 0; 0]; %Final State
 % xf(1) = 161.934; % = 0.1 miles
 max_velocity = 15; % = 33.554mph
-dt = 1;
+dt = 0.01;
 
 % Create double track model
 model = DoubleTrackModel();
@@ -29,10 +29,10 @@ N = length(times);
 
 % Define constraints
 umin = [-pi/4; 0; 0];
-umax = [pi/4; 300; 150];
+umax = [pi/4; 300; 1500];
 
 % Define LQR costs... but for MPC
-Q = diag([10 10 10 1 1 0 0 0 0]);
+Q = diag([100 1 1 1 1 0.1 0.1 0.1 0.1]);
 R = diag([0.1 0.1 0.1]);
 Qf = Q;
 
@@ -83,10 +83,12 @@ mpc.setup(P, q, C, lb, ub);
 
 
 % SIMULATE!!!
-x = x0;
-for k = 1:length(times)-2
+x_t = x0;
+X = zeros(size(Xref));
+for k = 1:N-1
     disp(times(k))
-    disp(x)
+    disp(x_t)
+    X(:,k) = x_t;
     % Solve
     res = mpc.solve();
 
@@ -98,12 +100,13 @@ for k = 1:length(times)-2
     % Apply first control input to the plant
     ctrl = res.x(n+m+1:n+m+m);
     disp(ctrl)
-    x = A(:,:,k+1)*x + B(:,:,k+1)*ctrl;
+    x_t = A(:,:,k)*x_t + B(:,:,k)*ctrl;
     
     % Update initial state
-    lb(1:n) = -x;
-    ub(1:n) = -x;
+    lb(1:n) = -x_t;
+    ub(1:n) = -x_t;
     mpc.update('l', lb, 'u', ub);
 end
-disp("Final State")
-disp(x)
+X(:,N) = x_t;
+disp("Final State|Xf Ref")
+disp([x_t xf])
