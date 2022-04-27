@@ -10,18 +10,19 @@ clear all
 %   X:
 %       None?
 
-Nmpc = 10; %MPC Horizon
+Nmpc = 30; %Rollout Horizon
 x0 = [0; 0; 0; 0; 0; 0; 0; 0; 0]; %Initial State
 xf = [161.934; 0; 0; 0; 0; 0; 0; 0; 0]; %Final State
 % xf(1) = 161.934; % = 0.1 miles
+u_const = [0;10;0];
 max_velocity = 15; % = 33.554mph
-dt = 0.01;
+dt = 0.1;
 
 % Create double track model
 model = DoubleTrackModel();
 
 % Create reference trajectory
-[Xref, Uref, times] = genRefTraj_simplified(x0, xf, max_velocity, dt);
+[Xref, Uref, times] = genRefTraj_simplified(x0, xf, u_const, max_velocity, dt);
 
 n = length(Xref(:,1));
 m = length(Uref(:,1));
@@ -32,7 +33,7 @@ umin = [-pi/4; 0; 0];
 umax = [pi/4; 300; 1500];
 
 % Define LQR costs... but for MPC
-Q = diag([100 1 1 1 1 0.1 0.1 0.1 0.1]);
+Q = diag([10 10 1 1 1 0.01 0.01 0.01 0.01]);
 R = diag([0.1 0.1 0.1]);
 Qf = Q;
 
@@ -69,8 +70,8 @@ end
 U = kron(eye(Nmpc-1), [eye(m) zeros(m,n)]);
 C = [D;U];
 
-lb_Uref = zeros(3,Nmpc-1);
-ub_Uref = zeros(3,Nmpc-1);
+lb_Uref = zeros(m,Nmpc-1);
+ub_Uref = zeros(m,Nmpc-1);
 for k = 1:Nmpc-1
     lb_Uref(:,k) = umin - Uref(:,k);
     ub_Uref(:,k) = umax - Uref(:,k);
@@ -101,7 +102,9 @@ for k = 1:N-1
     ctrl = res.x(n+m+1:n+m+m);
     disp(ctrl)
     x_t = A(:,:,k)*x_t + B(:,:,k)*ctrl;
-    
+%     x_t = x_t+model.continuous_dynamics(x_t,ctrl)';
+%     x_t = model.dynamics_rk4(x_t,ctrl, dt);
+
     % Update initial state
     lb(1:n) = -x_t;
     ub(1:n) = -x_t;
@@ -110,3 +113,11 @@ end
 X(:,N) = x_t;
 disp("Final State|Xf Ref")
 disp([x_t xf])
+figure(1)
+hold on
+plot(X(1,:),X(2,:),'-o')
+% plot(xf(1),xf(2), 'r-o')
+hold off
+xlabel('x position')
+ylabel('y position')
+title('MPC')
