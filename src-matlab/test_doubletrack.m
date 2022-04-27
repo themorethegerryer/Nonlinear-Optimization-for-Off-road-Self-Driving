@@ -3,10 +3,10 @@ clear all;
 clc;
 
 % define sample state
-X_init = [0 0 0 0 0 0 0 0 0];
+X_init = [0 0 0 4 0 100 100 100 100];
 
 % define sample control input
-U_init = [0 0 100];
+U_init = [0 -30];
 
 % accelerator between 0 and 70
 % brake between 0 and 150
@@ -25,26 +25,38 @@ double_track_car = DoubleTrackModel(m, mw, lw, lr, lf, Rw, c);
 
 % step through dynamics 
 dt = 0.1;
-t = 0:dt:5;
-xVect = [X_init];
+t = 0:dt:4;
 
+U_init_const_steer = U_init(1);
+U_init_const_throttle = U_init(2);
+
+xVect = [X_init];
+xVect_discrete = [X_init];
 for i=1:length(t)
     if i == 1
        temp_xVect = X_init;
+%        temp_xVect_discrete = X_init;
     else
         temp_xVect = xVect(i,:);
+%         temp_xVect_discrete = xVect_discrete(i,:);
     end
-    X_n_1 = double_track_car.dynamics_rk4(temp_xVect, U_init, dt);
+%     U_init(1) = (rand(1)-0.5)*(pi/2)+U_init_const_steer;
+%     U_init(2) = (rand(1)-0.5)*200+U_init_const_throttle;
+    X_n_1 = double_track_car.dynamics_rk4(temp_xVect, U_init, t(i), dt);
     xVect = [xVect ; X_n_1];
+%     jac = double_track_car.discrete_jacobian(temp_xVect_discrete,U_init);
+%     X_n_1_discrete = jac.A*temp_xVect_discrete' + jac.B*U_init';
+%     xVect_discrete = [xVect_discrete ; X_n_1_discrete'];
+%         disp(U_init);
 end
 
-% X_init = [0 0 0.1 2 2 100 100 100 100];
-% 
-% jac = double_track_car.discrete_jacobian(X_init, U_init);
-% jac = numeric_jacobian(double_track_car,X_init,U_init, 0.01);
-
-xVect(end,:)
-
 % plot
-plot(xVect(:,1),xVect(:,2))
+figure()
+hold on
+
+plot(xVect(:,1),xVect(:,2),'-o')
+
+title('varying random control inputs')
+xlabel('x position')
+ylabel('y position')
 ylim([-2 2])

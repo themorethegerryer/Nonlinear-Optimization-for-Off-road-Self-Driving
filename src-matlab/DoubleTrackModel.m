@@ -55,7 +55,8 @@ classdef DoubleTrackModel
             
             % TODO: assume Fz is equal across all wheels
             Fz = car.m*9.81/4;
-            brake_force = controls(3);
+%             brake_force = controls(3);
+            brake_force = 0;
             roll_frict_force = 0;
 %             if state(4) > 0
 % %                 brake_force = controls(3);
@@ -96,11 +97,11 @@ classdef DoubleTrackModel
             dxdt(9) = (1/car.Iwheel)*(controls(2) - brake_force - roll_frict_force);
         end
         
-        function X_n_1 = dynamics_rk4(car,X,U, dt)
+        function X_n_1 = dynamics_rk4(car,X,U,timeVal,dt)
             uTemp = U;
 %             uTemp(1) = uTemp(1) + 0.1*timeVal;
-%             if timeVal > 1.0
-%                uTemp(1) = 0.1; 
+%             if mod(timeVal,3) == 0
+%                uTemp(1) = -1 * uTemp(1); 
 %             end
             f1 = continuous_dynamics(car, X, uTemp);
             f2 = continuous_dynamics(car, X + 0.5*dt*f1, uTemp);
@@ -119,7 +120,7 @@ classdef DoubleTrackModel
 %             if nargin < 3
 %                 epsilon = 1e-5; 
 %             end
-            epsilon = 1e-3;
+            epsilon = 0.1;
             epsilon_inv = 1/(epsilon); % (1 / (2*epsilon))
             nx = length(x); % Dimension of the input x;
             f0 = car.continuous_dynamics(x,u);
@@ -272,7 +273,7 @@ classdef DoubleTrackModel
             % set NaN values to zero (i.e. vechile is not moving)
             longSlip(isnan(longSlip)) = 0;
             slip.long_slip = longSlip;
-%             disp(slip);
+            disp(slip);
         end
         
         function theta = ackermann_turn(car, steering_angle)
