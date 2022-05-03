@@ -1,57 +1,32 @@
 classdef DoubleTrackModel
     % Model dynamics for the double track model for the purpose of off-road
     % autonomous driving
+    % Based on MODEL FIDELITY AND TRAJECTORY PLANNING FOR AUTONOMOUS 
+    % VEHICLES AT THE LIMIT by John K. Subosits
     
     properties
-        m = 2000    % mass of the car (kg)
-        mw = 10     % mass of each tire (kg) 
-        lw = 1.8    % width of car - distance b/w center of tire (m)
-        lr = 2.25   % distance from rear to center of mass (m)
-        lf = 2.25   % distance from front to center of mass (m)
-        h = 1.5     % height of car (m)
-        h_CoM = 0.5 % height of car's center of mass (m)  
-        Rw = 0.23   % effective tire radius (m)
-        c = 0.04    % rolling friction coefficient
-        w_wheel = 0.3 % width of tire (m) (i.e. average is 12.5 inches)
-        
-        length
-        Iz
-        Iy
-        Iwheel
-        
+        a = 1.19        % Distance from c.g. to front axle (m)
+        b = 1.44        % Distance from c.g. to rear axle (m)
+        df = 1.54       % Front track width (m)
+        dr = 1.52       % Rear track width (m)
+        hcg = 0.56      % Center of gravity height (m)
+        gamma = 0.64    % Front lateral load transfer fraction
+        m = 1776        % Vehicle mass (kg)
+        Ixx = 1200      % Moment of inertia about longitudinal axis (kg*m^2)
+        Iyy = 3200      % Moment of inertia about lateral axis (kg*m^2)
+        Izz = 3950      % Moment of inertia about vertical axis (kg*m^2)
+        Klat = 23.2     % Lateral load transfer time constant (1/s)
+        Klong = 15.7    % Longitudinal load transfer time constant (1/s)
     end
     
     methods
-        function car = DoubleTrackModel(m, mw, lw, lr, lf, Rw, c)
+        function car = DoubleTrackModel()
             % Double Track Model Constructor
-            if nargin < 2
-                car.m = 2000;
-                car.mw = 10;
-                car.lw = 1.8;
-                car.lr = 2.25;
-                car.lf = 2.25;
-                car.Rw = 0.23;
-                car.c = 0.04;
-                car.w_wheel = 0.3;
-            else
-                car.m = m;
-                car.mw = mw;
-                car.lw = lw;
-                car.lr = lr;
-                car.lf = lf;
-                car.Rw = Rw;
-                car.c = c;
-                car.w_wheel = 0.3;
-            end
-            car.length = car.lr+car.lf;
-            car.Iz = (car.m)*(car.length^2 + car.lw^2)/12;
-            car.Iy = (car.m)*(car.length^2 + car.h^2)/12;
-            car.Iwheel = (car.mw)*((car.Rw/2)^2)/2; %effective radius divided by 2 because tire mass is focused at center
         end
         
-        function dxdt = continuous_dynamics(car, state, controls)% ax, ay, rdot, wdot
-            % state = [x y r xdot ydot wfl wfr wrl wrr]
-            % dxdt = [xdot ydot rdot xdotdot ydotdot wfldot wfrdot wrldot wrrdot]
+        function dxdt = continuous_dynamics(car, x, u)% ax, ay, rdot, wdot
+            % x = [uy r ux dPsi e dFzlong dFzlat delta]
+            % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
             
             % TODO: assume Fz is equal across all wheels
             Fz = car.m*9.81/4;
