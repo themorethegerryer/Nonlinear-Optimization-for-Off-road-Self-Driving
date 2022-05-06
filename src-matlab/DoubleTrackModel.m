@@ -28,6 +28,9 @@ classdef DoubleTrackModel
         c2 = 2.14       % Lateral stiffness peak
         n_coup = 4.23   % Lateral-longitudinal coupling
         c8 = 10         % Longitudinal stiffness
+
+        L
+        D
     end
     
     methods
@@ -79,17 +82,19 @@ classdef DoubleTrackModel
             slip_bundle = slip_function(car, x);
     
             % Pre-calcuate variables needed in equations
-            p = 1;% roll rate
-            pdot = 1; % roll acceleration
-            q = 1;% pitch rate
-            qdot = 1; % pitch acceleration
-            uz = 1;% vertical velocity
+            % given the interaction between the car and the environment
+            % TODO assume values are zero for now
+            p = 0;% roll rate
+            pdot = 0; % roll acceleration
+            q = 0;% pitch rate
+            qdot = 0; % pitch acceleration
+            uz = 0;% vertical velocity
             k = 1; % curvature describing how path tangent roates about the normal to the road surface with distance traveled along the path - Page 3
     
             % g = g_x*b_x + g_y*b_y + g_z*b_z, gravity in the body frame
             gx = 0;
-            gy = 9.81;
-            gz = 0;
+            gy = 0;
+            gz = -9.81;
 
             % compute Fz of each tire
             wheelFz_bundle = tire_fz_function(car, x, car.m*9.81);
@@ -133,16 +138,25 @@ classdef DoubleTrackModel
             %confirm that h = hcg here
             dxdt(6) = -car.Klong*(dFzlong+((p*r*(car.Izz-car.Ixx))/car.L)-((car.hcg*(Fxf*cos(delta)+Fxr-Fyf*sin(delta))+car.Iyy*qdot)/car.L));
             
-            % ddFzlong/dt - Page 96 - eq. 4.11
+            % ddFzlat/dt - Page 96 - eq. 4.11
             %confirm that h = hcg here
-            dxdt(7) = -car.Klat*(dFzlat+((q*r*(car.Izz-car.Iyy))/car.D)-((car.hcg*(Fyf*cos(delta)+Fyr-Fxf*sin(delta))-car.Ixx*pdot)/car.D));
+            dxdt(7) = -car.Klat*(dFzlat+((q*r*(car.Izz-car.Iyy))/car.D)-((car.hcg*(Fyf*cos(delta)+Fyr+Fxf*sin(delta))-car.Ixx*pdot)/car.D));
     
             % ddelta/dt
             % TODO redo using state equations
             dxdt(8) = deltadot;
+
+            % TODO placeholder x-position
+            dxdt(9) = x(3);
+
+            % TODO placeholder y-position
+            dxdt(10) = x(1);
+
         end
         
         function x_next = dynamics_rk4(car,x,u,dt)
+            % x = [uy r ux dPsi e dFzlong dFzlat delta]
+            % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
             uTemp = u;
 %             uTemp(1) = uTemp(1) + 0.1*timeVal;
 %             if mod(timeVal,3) == 0
@@ -160,13 +174,13 @@ classdef DoubleTrackModel
         function Fz_bundle = tire_fz_function(car, x, Fz)
             % x = [uy r ux dPsi e dFzlong dFzlat delta]
             % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
-            Fz_bundle.fl = (((car.b/car.L)*Fz - x(6))/2) - car.gamma*u(7); % eq 4.13
-            Fz_bundle.fr = (((car.b/car.L)*Fz - x(6))/2) + car.gamma*u(7); % eq 4.14
-            Fz_bundle.rl = (((car.a/car.L)*Fz + x(6))/2) - (1 - car.gamma)*u(7); % eq 4.15
-            Fz_bundle.rr = (((car.a/car.L)*Fz + x(6))/2) + (1 - car.gamma)*u(7); % eq 4.16
+            Fz_bundle.fl = (((car.b/car.L)*Fz - x(6))/2) - car.gamma*x(7); % eq 4.13
+            Fz_bundle.fr = (((car.b/car.L)*Fz - x(6))/2) + car.gamma*x(7); % eq 4.14
+            Fz_bundle.rl = (((car.a/car.L)*Fz + x(6))/2) - (1 - car.gamma)*x(7); % eq 4.15
+            Fz_bundle.rr = (((car.a/car.L)*Fz + x(6))/2) + (1 - car.gamma)*x(7); % eq 4.16
         end
 
-        function tire_corner_stiffness = cornering_stiffnes(car, tire_mu, Fz, Fx) % eq 4.20
+        function tire_corner_stiffness = cornering_stiffness(car, tire_mu, Fz, Fx) % eq 4.20
             % TODO replace Fx with the state of the car
             % x = [uy r ux dPsi e dFzlong dFzlat delta]
             % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
@@ -295,11 +309,11 @@ classdef DoubleTrackModel
             % TODO may not need to use for this model
             radius = car.L*tan((pi/2)-steering_angle);
             if steering_angle < 0
-                theta.left = atan(car.L/(radius+(car.df/2))); % *(180/pi);
-                theta.right = atan(car.L/(radius-(car.df/2))); % *(180/pi);
+                theta.left = atan(car.L/(radius+(car.D/2))); % *(180/pi);
+                theta.right = atan(car.L/(radius-(car.D/2))); % *(180/pi);
             else
-                theta.right = atan(car.L/(radius+(car.df/2))); % *(180/pi);
-                theta.left = atan(car.L/(radius-(car.df/2))); % *(180/pi);
+                theta.right = atan(car.L/(radius+(car.D/2))); % *(180/pi);
+                theta.left = atan(car.L/(radius-(car.D/2))); % *(180/pi);
             end
         end
     end
