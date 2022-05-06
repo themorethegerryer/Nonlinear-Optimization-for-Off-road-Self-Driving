@@ -1,6 +1,6 @@
 function [Xref, Uref, times]=genRefTraj_simplified(x0, xf, u_const, maxVel, dt)
-    % x = [x y r xdot ydot wfl wfr wrl wrr] -> 9x1
-    % u = [theta_steer torque] -> 2x1
+    % x = [uy r ux dPsi e dFzlong delta]
+    % u = [deltadot Fxfbrake Fxr Fengine]
 
     % compute delta between init and goal states
     delta = x0(1:3) - xf(1:3);

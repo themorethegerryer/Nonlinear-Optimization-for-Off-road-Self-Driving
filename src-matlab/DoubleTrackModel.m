@@ -33,13 +33,95 @@ classdef DoubleTrackModel
     methods
         function car = DoubleTrackModel()
             % Double Track Model Constructor
-            car.L = car.a + car.b;
+            car.L = car.a + car.b; % vehicle's wheelbase
+            car.D = max(car.dr,car.df); % width of car
         end
         
         function dxdt = continuous_dynamics(car, x, u)% ax, ay, rdot, wdot
-            % x = [uy r ux dPsi e dFzlong dFzlat delta]
-            % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
-            % TODO equation of motion go here
+        % x = [uy r ux dPsi e dFzlong dFzlat delta]
+        % uy: vehicle's lateral velocity ~ 1 m/s
+        % r: yaw rate ~ 0.1 rad/s
+        % ux: vehicle's longitudinal velocity (straight forward) ~ 1 m/s
+        % dPsi = z-axis rotation difference between body frame and path (angle between b_x and p_x) ~ 0.01 rad
+        % e: distance from path to car's c.g. in p_y direction (e*p_y = distance from path) ~ 1 m
+        % dFzlong: longitudinal load transfer ~ 500 N
+        % dFzlat: lateral load transfer ~ 500 N
+        % delta: current steering angle ~ 0.1 rad
+        %
+        % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
+        % deltadot: change in steering angle ~ 0.1 rad/s
+        % Fxflbrake: Front left tire brake force ~ 500 N
+        % Fxfrbrake: Front right tire brake force ~ 500 N
+        % Fxrl: Rear left tire driving force ~ 300 N
+        % Fxrr: Rear right tire driving force ~ 300 N
+        % Fengine: Torque applied to rear tires by engine ~ 500 N
+        % udiff: Degree of locking in the differential [0,1] ~ 1
+            dxdt = zeros(size(x));
+
+            % Pull state and control variables out for easy equation reference
+            uy = x(1);
+            r = x(2);
+            ux = x(3);
+            dPsi = x(4);
+            e = x(5);
+            dFzlong = x(6);
+            dFzlat = x(7);
+            delta = x(8);
+
+            deltadot = u(1);
+            Fxflbrake = u(2);
+            Fxfrbrake = u(3);
+            Fxrl = u(4);
+            Fxrr = u(5);
+            Fengine = u(6);
+            udiff = u(7);
+
+            % Pre-calcuate variables needed in equations
+            p = 1;% roll rate
+            pdot = 1; % roll acceleration
+            q = 1;% pitch rate
+            qdot = 1; % pitch acceleration
+            uz = 1;% vertical velocity
+            k = 1; % curvature describing how path tangent roates about the normal to the road surface with distance traveled along the path - Page 3
+
+            % g = g_x*b_x + g_y*b_y + g_z*b_z, gravity in the body frame
+            gx = 0;
+            gy = 9.81;
+            gz = 0;
+
+            Fyf = 1;
+            Fyr = 1;
+            Fxf = 1;
+            Fxr = 1;
+
+            Fdrag = 0;
+
+            % duy/dt - Page 95
+            dxdt(1) = ((Fyf*cos(delta) + Fyr + Fxf*sin(delta))/car.m)-r*ux+p*uz+gy;
+
+            % dr/dt - Page 95
+            % For single track, Fxrr = Fxrl, Fxfr = Fxfl, and Fyfl = Fyfr so 2nd and 3rd terms are 0.
+            dxdt(2) = ((car.a*(Fyf*cos(delta)+Fxf*sin(delta)) - car.b*Fyr)/car.Izz) + (((car.Ixx - car.Iyy)*p*q)/car.Izz);
+
+            % dux/dt - Page 95
+            dxdt(3) = ((Fxf*cos(delta)+Fxr-Fyf*sin(delta)-Fdrag)/car.m) + r*uy-q*uz+gx;
+
+            % ddPsi/dt - Page 96
+            dxdt(4) = r - ((ux*cos(dPsi)-uy*sin(dPsi))/(1-k*e))*k;
+
+            % de/dt - Page 96
+            dxdt(5) = ux*sin(dPsi)+uy*cos(dPsi);
+
+            % ddFzlong/dt - Page 96
+            %confirm that h = hcg here
+            dxdt(6) = -car.Klong(dFzlong+((p*r*(car.Izz-car.Ixx))/car.L)-((car.hcg*(Fxf*cos(delta)+Fxr-Fyf*sin(delta))+car.Iyy*qdot)/car.L));
+            
+            % ddFzlong/dt - Page 96
+            %confirm that h = hcg here
+            dxdt(7) = -car.Klong(dFzlat+((q*r*(car.Izz-car.Iyy))/car.D)-((car.hcg*(Fyf*cos(delta)+Fyr-Fxf*sin(delta))+car.Ixx*pdot)/car.D));
+
+            % ddelta/dt
+            dxdt(8) = delta + deltadot;
         end
         
         function x_next = dynamics_rk4(car,x,u,dt)
