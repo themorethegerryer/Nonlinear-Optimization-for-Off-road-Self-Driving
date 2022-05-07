@@ -3,12 +3,28 @@ clear all;
 clc;
 
 % define sample state
-% x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos]
-X_init = [0 0 0 0 0 0 0 0.1 0 0];
+% x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
+X_init = [0, ... % uy
+    0, ... % r 
+    0, ... % ux
+    0, ... % dPsi
+    0, ... % e
+    0, ... % dFzlong
+    0, ... % dFzlat
+    0, ... % delta
+    0, ... % x-position
+    0, ... % y-position
+    0]; % yaw-orientation
 
 % define sample control input
 % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
-U_init = [0 0 0 0 0 100 0];
+U_init = [0, ... % deltadot
+    0, ... % Fxflbrake
+    0, ... % Fxfrbrake
+    0, ... % Fxrl
+    0, ... % Fxrr
+    0, ... % Fengine
+    0]; % u-differential
 
 double_track_car = DoubleTrackModel();
 
@@ -19,7 +35,7 @@ t = 0:dt:2;
 xVect = [X_init];
 xVect_discrete = [X_init];
 for i=1:length(t)
-    i
+%     i
     if i == 1
        temp_xVect = X_init;
 %        temp_xVect_discrete = X_init;
@@ -46,4 +62,5 @@ plot(xVect(:,9),xVect(:,10),'-o')
 title('varying random control inputs')
 xlabel('x position')
 ylabel('y position')
-% ylim([-2 2])
+% ylim([-.1 .1])
+% xlim([-.1 .1])

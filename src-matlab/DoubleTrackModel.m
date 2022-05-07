@@ -20,14 +20,14 @@ classdef DoubleTrackModel
         Klong = 15.7    % Longitudinal load transfer time constant (1/s)
 
         % vehicle and surface properties
-        % parameters for ice
+        % parameters for wet asphalt
         Fz0 = 4470      % Nominal normal load (N)
-        mu0 = 0.267     % Nominal friction coefficient
-        mu_dFz = -0.011 % Friction sensitivity
-        c1 = 22.0       % Lateral stiffness parameter
-        c2 = 2.14       % Lateral stiffness peak
-        n_coup = 4.23   % Lateral-longitudinal coupling
-        c8 = 10         % Longitudinal stiffness
+        mu0 = 0.81     % Nominal friction coefficient
+        mu_dFz = -0.232 % Friction sensitivity
+        c1 = 22.8       % Lateral stiffness parameter
+        c2 = 1.5       % Lateral stiffness peak
+        n_coup = 2.5   % Lateral-longitudinal coupling
+        c8 = 6.55         % Longitudinal stiffness
 
         L
         D
@@ -77,9 +77,9 @@ classdef DoubleTrackModel
             Fxrl = u(4);
             Fxrr = u(5);
             Fengine = u(6);
-            udiff = u(7);
+            udiff = u(7); % TODO differential is always open
 
-            slip_bundle = slip_function(car, x);
+%             slip_bundle = slip_function(car, x);
     
             % Pre-calcuate variables needed in equations
             % given the interaction between the car and the environment
@@ -97,7 +97,7 @@ classdef DoubleTrackModel
             gz = -9.81;
 
             % compute Fz of each tire
-            wheelFz_bundle = tire_fz_function(car, x, car.m*9.81);
+            wheelFz_bundle = tire_fz_function(car, x, -car.m*9.81);
             wheelFxFy_bundle = tire_model(car, wheelFz_bundle, x, u);
 
             % TODO placeholder for Fxfl
@@ -124,7 +124,7 @@ classdef DoubleTrackModel
     
             % dr/dt - Page 95 - eq. 4.5
             dxdt(2) = ((car.a*(Fyf*cos(delta)+Fxf*sin(delta)) - car.b*Fyr)/car.Izz) + (((0.5*car.dr*(Fxrr - Fxrl))+(0.5*car.df*(Fxfr - Fxfl)*cos(delta)))/car.Izz) + (((Fyfl - Fyfr)*sin(delta))/car.Izz) + (((car.Ixx - car.Iyy)*p*q)/car.Izz);
-    
+%             dxdt(2)
             % dux/dt - Page 95 - eq. 4.6
             dxdt(3) = ((Fxf*cos(delta)+Fxr-Fyf*sin(delta)-Fdrag)/car.m) + r*uy-q*uz+gx;
     
@@ -151,6 +151,9 @@ classdef DoubleTrackModel
 
             % TODO placeholder y-position
             dxdt(10) = x(1);
+
+            % TODO placeholder yaw orientation
+            dxdt(11) = x(2);
 
         end
         
@@ -184,7 +187,8 @@ classdef DoubleTrackModel
             % TODO replace Fx with the state of the car
             % x = [uy r ux dPsi e dFzlong dFzlat delta]
             % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
-            tire_normal_stiffness = car.c1*car.Fz0*sin(2*atan(Fz/(car.c2*car.Fz0))); % eq 4.21
+%             tire_normal_stiffness = car.c1*car.Fz0*sin(2*atan(Fz/(car.c2*car.Fz0))); % eq 4.21
+            tire_normal_stiffness = car.c1*car.Fz0*sin(2*atan2(car.c2*car.Fz0,Fz)); % eq 4.21
             
             term1 = 0.5*(tire_mu*Fz - Fx);
             term2_1 = (1 - (abs(Fx)/(tire_mu*Fz))^car.n_coup)^(1/car.n_coup);
@@ -292,12 +296,16 @@ classdef DoubleTrackModel
             Vy = x(1);
 %             theta = ackermann_turn(car, U(1));
             steering_angle = x(8);
+            sideSlip_fl = 0;
+            sideSlip_fr = 0;
+            sideSlip_rl = 0;
+            sideSlip_rr = 0;
             
             % compute sideSlip for each wheel
-            sideSlip_fl = steering_angle - atan((Vy + car.df*r)/(Vx - (car.L/2)*r));
-            sideSlip_fr = steering_angle - atan((Vy + car.df*r)/(Vx + (car.L/2)*r));
-            sideSlip_rl = -atan((Vy - car.dr*r)/(Vx-(car.L/2)*r));
-            sideSlip_rr = -atan((Vy - car.dr*r)/(Vx+(car.L/2)*r));
+%             sideSlip_fl = steering_angle - atan((Vy + car.a*r)/(Vx - (car.df/2)*r));
+%             sideSlip_fr = steering_angle - atan((Vy + car.a*r)/(Vx + (car.df/2)*r));
+%             sideSlip_rl = -atan((Vy - car.b*r)/(Vx-(car.dr/2)*r));
+%             sideSlip_rr = -atan((Vy - car.b*r)/(Vx+(car.dr/2)*r));
 
             sideSlip = [sideSlip_fl sideSlip_fr sideSlip_rl sideSlip_rr];
             % set NaN values to zero (i.e. car moving foward)
