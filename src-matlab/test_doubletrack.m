@@ -17,13 +17,11 @@ X_init = [0, ... % uy
     0]; % yaw-orientation
 
 % define sample control input
-% u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
+% u = [deltadot Fxfbrake Fxr Fengine udiff]
 U_init = [0, ... % deltadot
-    0, ... % Fxflbrake
-    0, ... % Fxfrbrake
-    0, ... % Fxrl
-    0, ... % Fxrr
-    0, ... % Fengine
+    0, ... % Fxfbrake
+    0, ... % Fxr
+    100, ... % Fengine
     0]; % u-differential
 
 double_track_car = DoubleTrackModel();

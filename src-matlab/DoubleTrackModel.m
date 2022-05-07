@@ -41,7 +41,7 @@ classdef DoubleTrackModel
         end
         
         function dxdt = continuous_dynamics(car, x, u)% ax, ay, rdot, wdot
-        % x = [uy r ux dPsi e dFzlong dFzlat delta]
+        % x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
         % uy: vehicle's lateral velocity ~ 1 m/s
         % r: yaw rate ~ 0.1 rad/s
         % ux: vehicle's longitudinal velocity (straight forward) ~ 1 m/s
@@ -51,12 +51,10 @@ classdef DoubleTrackModel
         % dFzlat: lateral load transfer ~ 500 N
         % delta: current steering angle ~ 0.1 rad
         %
-        % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
+        % u = [deltadot Fxfbrake Fxr Fengine udiff]
         % deltadot: change in steering angle ~ 0.1 rad/s
-        % Fxflbrake: Front left tire brake force ~ 500 N
-        % Fxfrbrake: Front right tire brake force ~ 500 N
-        % Fxrl: Rear left tire driving force ~ 300 N
-        % Fxrr: Rear right tire driving force ~ 300 N
+        % Fxflbrake: Front left and right tire brake force ~ 500 N
+        % Fxrl: Rear left and right tire driving force ~ 300 N
         % Fengine: Torque applied to rear tires by engine ~ 500 N
         % udiff: Degree of locking in the differential [0,1] ~ 1
             dxdt = zeros(size(x));
@@ -72,12 +70,10 @@ classdef DoubleTrackModel
             delta = x(8);
     
             deltadot = u(1);
-            Fxflbrake = u(2); % Fxflbrake
-            Fxfrbrake = u(3); % Fxfrbrake
-            Fxrl = u(4);
-            Fxrr = u(5);
-            Fengine = u(6);
-            udiff = u(7); % TODO differential is always open
+            Fxfbrake = u(2);
+            Fxr = u(3);
+            Fengine = u(4);
+            udiff = u(5); % TODO differential is always open
 
 %             slip_bundle = slip_function(car, x);
     
@@ -95,6 +91,11 @@ classdef DoubleTrackModel
             gx = 0;
             gy = 0;
             gz = -9.81;
+
+            Fxflbrake = Fxfbrake/2; % Fxflbrake
+            Fxfrbrake = Fxfbrake/2; % Fxfrbrake
+            Fxrl = Fxr/2;
+            Fxrr = Fxr/2;
 
             % compute Fz of each tire
             wheelFz_bundle = tire_fz_function(car, x, -car.m*9.81);
@@ -158,8 +159,8 @@ classdef DoubleTrackModel
         end
         
         function x_next = dynamics_rk4(car,x,u,dt)
-            % x = [uy r ux dPsi e dFzlong dFzlat delta]
-            % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
+            % x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
+            % u = [deltadot Fxfbrake Fxr Fengine udiff]
             uTemp = u;
 %             uTemp(1) = uTemp(1) + 0.1*timeVal;
 %             if mod(timeVal,3) == 0
@@ -175,8 +176,8 @@ classdef DoubleTrackModel
         end
 
         function Fz_bundle = tire_fz_function(car, x, Fz)
-            % x = [uy r ux dPsi e dFzlong dFzlat delta]
-            % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
+            % x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
+            % u = [deltadot Fxfbrake Fxr Fengine udiff]
             Fz_bundle.fl = (((car.b/car.L)*Fz - x(6))/2) - car.gamma*x(7); % eq 4.13
             Fz_bundle.fr = (((car.b/car.L)*Fz - x(6))/2) + car.gamma*x(7); % eq 4.14
             Fz_bundle.rl = (((car.a/car.L)*Fz + x(6))/2) - (1 - car.gamma)*x(7); % eq 4.15
@@ -185,8 +186,8 @@ classdef DoubleTrackModel
 
         function tire_corner_stiffness = cornering_stiffness(car, tire_mu, Fz, Fx) % eq 4.20
             % TODO replace Fx with the state of the car
-            % x = [uy r ux dPsi e dFzlong dFzlat delta]
-            % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
+            % x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
+            % u = [deltadot Fxfbrake Fxr Fengine udiff]
 %             tire_normal_stiffness = car.c1*car.Fz0*sin(2*atan(Fz/(car.c2*car.Fz0))); % eq 4.21
             tire_normal_stiffness = car.c1*car.Fz0*sin(2*atan2(car.c2*car.Fz0,Fz)); % eq 4.21
             
@@ -197,25 +198,28 @@ classdef DoubleTrackModel
         end
 
         function tire_mu = tire_friction(car,Fz)
-            % x = [uy r ux dPsi e dFzlong dFzlat delta]
-            % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
+            % x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
+            % u = [deltadot Fxfbrake Fxr Fengine udiff]
             tire_mu = car.mu0 + (car.mu_dFz)*((Fz - car.Fz0) / car.Fz0); % eq 4.19
         end
 
         
         function Fwheel = tire_model(car, Fz_bundle, x, u) 
-            % x = [uy r ux dPsi e dFzlong dFzlat delta]
-            % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
+            % x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
+            % u = [deltadot Fxfbrake Fxr Fengine udiff]
             % TODO replace Fx with the state of the car
             % computer lateral force Fy
 
             % compute longitudinal force Fx
             % assume constant open differential
-            torque_engine = u(6);
-            Fxfl = torque_engine/2 - u(2);
-            Fxfr = torque_engine/2 - u(3);
-            Fxrl = u(4);
-            Fxrr = u(5);
+            torque_engine = u(4);
+            Fxfbrake = u(2);
+            Fxr = u(3);
+
+            Fxfl = torque_engine/2 - (Fxfbrake/2);
+            Fxfr = torque_engine/2 - (Fxfbrake/2);
+            Fxrl = Fxr/2;
+            Fxrr = Fxr/2;
 
             Fwheel.Fxfl = Fxfl;
             Fwheel.Fxfr = Fxfr;
@@ -289,8 +293,8 @@ classdef DoubleTrackModel
         end
 
         function slip = slip_function(car, x)
-            % x = [uy r ux dPsi e dFzlong dFzlat delta]
-            % u = [deltadot Fxflbrake Fxfrbrake Fxrl Fxrr Fengine udiff]
+            % x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
+            % u = [deltadot Fxfbrake Fxr Fengine udiff]
             r = x(2);
             Vx = x(3);
             Vy = x(1);
