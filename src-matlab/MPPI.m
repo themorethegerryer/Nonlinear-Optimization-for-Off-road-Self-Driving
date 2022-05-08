@@ -23,7 +23,7 @@ model = SingleTrackModel();
 % Create reference trajectory
 % [Xref, Uref, times] = genRefTraj_simplified(x0, xf, u_const, max_velocity, dt);
 Xref = [0 0 15 0 0 0 0]';
-Uref = [0 0 0 300]';
+Uref = [0 0 0 0]';
 
 % n = length(Xref(:,1));
 % m = length(Uref(:,1));
@@ -35,16 +35,18 @@ N = 100;
 % Define constraints
 % xmin = [-Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -pi/4]';
 % xmax = [Inf, Inf, Inf, Inf, Inf, Inf, pi/4]';
-umin = [-1, 0, 0, 10]';
-umax = [1, 150, 150, 300]';
+umin = [-1, 0, 0, 0]';
+umax = [1, 100, 100, 300]';
 
 % Define LQR costs... but for MPC
-Q = diag([1 1 10 10 10 0.1 0.1]);
-R = diag([0.1 0.1 0.1 0.1]);
+Q = diag([1 1 100 10 10 0.1 0.1]);
+R = diag([0.1 100 100 0.001]);
 % Q = diag([0 0 1 0 0 0 0]);
 % R = diag([0 0 0 0]);
 
 % Create MPPI Controller
+x_pos = zeros(N,1);
+y_pos = zeros(N,1);
 num_samples = 500;
 X = zeros(n,N);
 U = zeros(m,N-1);
@@ -81,16 +83,18 @@ for k = 1:N-1
     for uk = 1:num_samples
         weight = exp(-(1/scaling_factor)*cost(uk));
         sum_weights = sum_weights + weight;
-        weighted_traj(:,:,kk) = weight*u_perturb(:,:,kk);
+        weighted_traj(:,:,uk) = weight*u_perturb(:,:,uk);
     end
     
     u_mppi = u_start+(sum(weighted_traj,3)/sum_weights);
     U(:,k) = u_mppi(:,1);
     X(:,k+1) = model.dynamics_rk4(X(:,k)',u_mppi(:,1)', dt);%A(:,:,k)*x_start+B(:,:,k)*u_mppi(:,1);
+    x_pos(k+1) = x_pos(k)+ X(3,k+1)*dt;
+    y_pos(k+1) = y_pos(k)+ X(1,k+1)*dt;
 end
 figure(1)
 hold on
-plot(X(1,:),X(2,:),'-o')
+plot(x_pos,y_pos,'-o')
 % plot(xf(1),xf(2), 'r-o')
 hold off
 xlabel('x position')
