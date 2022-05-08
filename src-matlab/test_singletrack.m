@@ -4,17 +4,17 @@ clc;
 
 % define sample state
 % x = [uy r ux dPsi e dFzlong delta]
-X_init = [0 0 0 0 0 0 -0.2];
+X_init = [0 0 0 0 0 0 pi/2];
 
 % define sample control input
 % u = [deltadot Fxfbrake Fxr Fengine]
-U_init = [0 0 0 100];
+U_init = [0 0 0 10];
 
 single_track_car = SingleTrackModel();
 
 % step through dynamics 
 dt = 0.01;
-t = 0:dt:2;
+t = 0:dt:45;
 xpos = zeros(size(t));
 ypos = zeros(size(t));
 

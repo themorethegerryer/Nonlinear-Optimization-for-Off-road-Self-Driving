@@ -73,7 +73,7 @@ classdef SingleTrackModel
             q = 0;% pitch rate
             qdot = 0; % pitch acceleration
             uz = 0;% vertical velocity
-            k = 1; % curvature describing how path tangent roates about the normal to the road surface with distance traveled along the path - Page 33
+            k = 0; % curvature describing how path tangent rotates about the normal to the road surface with distance traveled along the path - Page 33
 
             % g = g_x*b_x + g_y*b_y + g_z*b_z, gravity in the body frame
             gx = 0;
@@ -221,7 +221,7 @@ classdef SingleTrackModel
             steering_angle = x(7);
             
             % compute sideSlip for each wheel
-            sideSlip_f = steering_angle;% - atan((Vy+ car.a*r)/Vx);
+            sideSlip_f = 0;%steering_angle - atan((Vy+ car.a*r)/Vx);
             sideSlip_r = 0;% - atan((Vy- car.b*r)/Vx);
 
             sideSlip = [sideSlip_f sideSlip_r];
