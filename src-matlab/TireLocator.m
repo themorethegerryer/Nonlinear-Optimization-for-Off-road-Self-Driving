@@ -1,11 +1,5 @@
-function [FLWheelT, FLWheelR, FRWheelT, FRWheelR, BLWheelT, BLWheelR, BRWheelT, BRWheelR] = TireLocator(CGx, CGy, CGz, CarA, CarB, CarDf, CarDr)
-CG: x y yaw
-ALL IN THE BODY FRAME
-Return: Z, Roll, Pitch, Zdot, Rolldot, Pitchdot
+function [z, roll, pitch, z_dot, roll_dot, pitch_dot] = TireLocator(CGx, CGy, CGyaw, CarA, CarB, CarDf, CarDr, CarCGH)
+% Global: x y z yaw Yawdot
+% Body: Xdot Ydot Zdot roll pitch Delta rolldot pitchdot
 
-
-Global: x y z yaw Yawdot
-Body: Xdot Ydot Zdot roll pitch Delta rolldot pitchdot
-
-Yawdot ~ Delta
 end
