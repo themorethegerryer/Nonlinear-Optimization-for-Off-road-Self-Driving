@@ -1,0 +1,5 @@
+function [FLWheelT, FLWheelR, FRWheelT, FRWheelR, BLWheelT, BLWheelR, BRWheelT, BRWheelR] = TireLocator(CGx, CGy, CGz, CarA, CarB, CarDf, CarDr)
+CG: x y yaw
+Return: x y z roll pitch yaw SE3 euler angle of car's rigid body
+Return: x y z yaw roll_grad pitch_grad SE2+height+terrain gradients dz(in terrain frame)/dx(in car frame)
+end
