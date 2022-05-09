@@ -63,8 +63,8 @@ classdef SingleTrackModel
             delta = x(7);
 
             deltadot = u(1);
-            Fxfbrake = u(2);
-            Fxr = u(3);
+            Fxfbrake = -u(2);
+            Fxr = -u(3);
             Fengine = u(4);
 
             % Pre-calcuate variables needed in equations
@@ -180,7 +180,7 @@ classdef SingleTrackModel
             % assume constant open differential
             torque_engine = u(4);
             Fxf = torque_engine - u(2);
-            Fxr = u(3);
+            Fxr = -u(3);
 
             Fwheel.Fxf = Fxf;
             Fwheel.Fxr = Fxr;
@@ -214,7 +214,7 @@ classdef SingleTrackModel
         function slip = slip_function(car, x) % POTENTIALLY TOXIC
             % x = [uy r ux dPsi e dFzlong delta]
             % u = [deltadot Fxfbrake Fxr Fengine]
-            r = x(2);
+%             r = x(2);
             Vx = x(3);
             Vy = x(1);
 %             theta = ackermann_turn(car, U(1));
