@@ -1,4 +1,4 @@
-classdef SingleTrackModel
+classdef KinematicBicycleModel
     % Model dynamics for the single track model for the controller state
     % Based on MODEL FIDELITY AND TRAJECTORY PLANNING FOR AUTONOMOUS 
     % VEHICLES AT THE LIMIT by John K. Subosits

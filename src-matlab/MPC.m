@@ -15,7 +15,7 @@ Nmpc = 30; %Rollout Horizon
 max_velocity = 15; % = 33.554mph
 dt = 0.1;
 
-x0 = [0 0 0 0 0 0 0]';
+x0 = [0 0 10 0 0 0 0]';
 
 % Create double track model
 model = SingleTrackModel();
@@ -24,24 +24,30 @@ model = SingleTrackModel();
 % [Xref, Uref, times] = genRefTraj_simplified(x0, xf, u_const, max_velocity, dt);
 Xref = [0 0 15 0 0 0 0]';
 Uref = [0 0 0 0]';
+POSref = [30 0 0]';
+TERRref = [0 0 0 0 0 0 0 0]';
 
 % n = length(Xref(:,1));
 % m = length(Uref(:,1));
 % N = length(times);
 n = length(Xref);
 m = length(Uref);
+pn = length(POSref);
+tn = length(TERRref);
 N = 100;
 
 % Define constraints
 xmin = [-Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -pi/4]';
 xmax = [Inf, Inf, Inf, Inf, Inf, Inf, pi/4]';
 umin = [-1, 0, 0, 0]';
-umax = [1, 250, Inf, 300]';
+umax = [1, 300, 300, 500]';
 
 % Define LQR costs... but for MPC
 Q = diag([1 1 10 10 10 0.1 0.1]);
-R = diag([0.1 0.1 0.1 0.1]);
 Qf = Q;
+R = diag([0.1 0.1 0.1 0.1]);
+Cposition = diag([1 1 0]);
+Cterrain = diag([1 1 1 1 1 1 1 1]);
 
 % Get A, B matrices (time-varying)
 % A = zeros(n,n,N-1);
@@ -51,25 +57,27 @@ Qf = Q;
 %     A(:,:,k) = jac.A;
 %     B(:,:,k) = jac.B;
 % end
-jac = model.discrete_jacobian(Xref, Uref);
+jac = model.discrete_jacobian([1 1 1 1 1 1 1], [1 1 1 1]);
 A = jac.A;
 B = jac.B;
 
 % Create MPC as OSQP
-Np = (Nmpc-1)*(n+m); % number of primals
-Nd = (Nmpc-1)*n + (Nmpc-1)*m; % number of duals
+Np = (Nmpc-1)*(n+m+pn+tn); % number of primals
+Nd = (Nmpc-1)*n + (Nmpc-1)*m + (Nmpc-1)*pn + (Nmpc-1)*tn; % number of duals
 
-P = blkdiag(kron(speye(Nmpc-2), blkdiag(sparse(R), sparse(Q))), sparse(R), sparse(Qf));
+P = blkdiag(kron(speye(Nmpc-2), blkdiag(sparse(R), sparse(Cterrain), sparse(Cposition), sparse(Q))), sparse(R), sparse(Cterrain), sparse(Cposition), sparse(Qf));
 
-q = zeros((Nmpc-2)*(n+m),1);
+q = zeros((Nmpc-2)*(n+m+pn+tn),1);
 % once k+i is less than the length of Xref/Uref, repeat Xref[end]/Uref[end] for remainder
 refidx = 0;
 for i = 1:Nmpc-2
 %     refidx = min(N-1,i);
-    q((m+n)*(i-1)+(1:m)) = -R*Uref;%(:,refidx);
-    q((m+n)*(i-1)+(m+1:m+n)) = -Q*Xref;%(:,refidx);
+    q((m+pn+tn+n)*(i-1)+(1:m)) = -R*Uref;%(:,refidx);
+    q((m+pn+tn+n)*(i-1)+(m+1:m+tn)) = -Cterrain*TERRref;
+    q((m+pn+tn+n)*(i-1)+(m+tn+1:m+tn+pn)) = -Cposition*POSref;
+    q((m+pn+tn+n)*(i-1)+(m+tn+pn+1:m+tn+pn+n)) = -Q*Xref;%(:,refidx);
 end
-q((m+n)*(Nmpc-2)+(m+1:m+n)) = -Qf*Xref;%(:,refidx);
+q((m+pn+tn+n)*(Nmpc-2)+(m+tn+pn+1:m+tn+pn+n)) = -Qf*Xref;%(:,refidx);
 
 D(1:n,1:m) = B(:,:,1);
 D(1:n,(m+1):(m+n)) = -eye(n);
