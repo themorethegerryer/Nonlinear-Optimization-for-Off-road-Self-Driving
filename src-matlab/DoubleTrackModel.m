@@ -38,6 +38,9 @@ classdef DoubleTrackModel
             % Double Track Model Constructor
             car.L = car.a + car.b; % vehicle's wheelbase
             car.D = max(car.dr,car.df); % width of car
+
+            % load TerrainData.mat file
+%             load("Terrain Generation and Simulation/TerrainData.mat");
         end
         
         function dxdt = continuous_dynamics(car, x, u)% ax, ay, rdot, wdot
@@ -70,8 +73,8 @@ classdef DoubleTrackModel
             delta = x(8);
     
             deltadot = u(1);
-            Fxfbrake = u(2);
-            Fxr = u(3);
+            Fxfbrake = -u(2);
+            Fxr = -u(3);
             Fengine = u(4);
             udiff = u(5); % TODO differential is always open
 
@@ -94,11 +97,11 @@ classdef DoubleTrackModel
 
             Fxflbrake = Fxfbrake/2; % Fxflbrake
             Fxfrbrake = Fxfbrake/2; % Fxfrbrake
-            Fxrl = Fxr/2;
-            Fxrr = Fxr/2;
+            Fxrl = -Fxr/2; % 
+            Fxrr = -Fxr/2;
 
             % compute Fz of each tire
-            wheelFz_bundle = tire_fz_function(car, x, -car.m*9.81);
+            wheelFz_bundle = tire_fz_function(car, x, car.m*9.81);
             wheelFxFy_bundle = tire_model(car, wheelFz_bundle, x, u);
 
             % TODO placeholder for Fxfl
@@ -188,13 +191,14 @@ classdef DoubleTrackModel
             % TODO replace Fx with the state of the car
             % x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
             % u = [deltadot Fxfbrake Fxr Fengine udiff]
-%             tire_normal_stiffness = car.c1*car.Fz0*sin(2*atan(Fz/(car.c2*car.Fz0))); % eq 4.21
-            tire_normal_stiffness = car.c1*car.Fz0*sin(2*atan2(car.c2*car.Fz0,Fz)); % eq 4.21
+            tire_normal_stiffness = car.c1*car.Fz0*sin(2*atan(Fz/(car.c2*car.Fz0))); % eq 4.21
+%             tire_normal_stiffness = car.c1*car.Fz0*sin(2*atan2(car.c2*car.Fz0,Fz)); % eq 4.21
             
             term1 = 0.5*(tire_mu*Fz - Fx);
             term2_1 = (1 - (abs(Fx)/(tire_mu*Fz))^car.n_coup)^(1/car.n_coup);
             term2_2 = tire_normal_stiffness-(0.5*tire_mu*Fz);
-            tire_corner_stiffness = term1 + (term2_1*term2_2);
+%             tire_corner_stiffness = term1 + (term2_1*term2_2);
+            tire_corner_stiffness = term1;
         end
 
         function tire_mu = tire_friction(car,Fz)
@@ -218,8 +222,8 @@ classdef DoubleTrackModel
 
             Fxfl = torque_engine/2 - (Fxfbrake/2);
             Fxfr = torque_engine/2 - (Fxfbrake/2);
-            Fxrl = Fxr/2;
-            Fxrr = Fxr/2;
+            Fxrl = -Fxr/2;
+            Fxrr = -Fxr/2;
 
             Fwheel.Fxfl = Fxfl;
             Fwheel.Fxfr = Fxfr;
@@ -295,7 +299,7 @@ classdef DoubleTrackModel
         function slip = slip_function(car, x)
             % x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
             % u = [deltadot Fxfbrake Fxr Fengine udiff]
-            r = x(2);
+            r = x(11);
             Vx = x(3);
             Vy = x(1);
 %             theta = ackermann_turn(car, U(1));

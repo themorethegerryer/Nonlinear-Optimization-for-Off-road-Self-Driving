@@ -5,16 +5,16 @@ clc;
 % define sample state
 % x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
 X_init = [0, ... % uy
-    0, ... % r 
+    0, ... % rdot 
     0, ... % ux
     0, ... % dPsi
     0, ... % e
     0, ... % dFzlong
     0, ... % dFzlat
-    0, ... % delta
+    0.1, ... % delta
     0, ... % x-position
     0, ... % y-position
-    0]; % yaw-orientation
+    0]; % r
 
 % define sample control input
 % u = [deltadot Fxfbrake Fxr Fengine udiff]
@@ -27,8 +27,8 @@ U_init = [0, ... % deltadot
 double_track_car = DoubleTrackModel();
 
 % step through dynamics 
-dt = 0.01;
-t = 0:dt:2;
+dt = 0.1;
+t = 0:dt:45;
 
 xVect = [X_init];
 xVect_discrete = [X_init];

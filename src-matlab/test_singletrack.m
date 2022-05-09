@@ -4,11 +4,11 @@ clc;
 
 % define sample state
 % x = [uy r ux dPsi e dFzlong delta]
-X_init = [0 0 0 0 0 0 pi/2];
+X_init = [0 0 10 0 0 0 0];
 
 % define sample control input
 % u = [deltadot Fxfbrake Fxr Fengine]
-U_init = [0 0 0 10];
+U_init = [0 1000 0 0];
 
 single_track_car = SingleTrackModel();
 
@@ -50,3 +50,4 @@ title('varying random control inputs')
 xlabel('x position')
 ylabel('y position')
 % ylim([-2 2])
+xVect(end,3)
