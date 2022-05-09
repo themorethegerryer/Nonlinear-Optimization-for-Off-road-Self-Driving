@@ -7,8 +7,6 @@ clc;
 X_init = [0, ... % uy
     0, ... % rdot 
     0, ... % ux
-    0, ... % dPsi
-    0, ... % e
     0, ... % dFzlong
     0, ... % dFzlat
     0.1, ... % delta
@@ -21,8 +19,7 @@ X_init = [0, ... % uy
 U_init = [0, ... % deltadot
     0, ... % Fxfbrake
     0, ... % Fxr
-    100, ... % Fengine
-    0]; % u-differential
+    100]; % Fengine
 
 double_track_car = DoubleTrackModel();
 
@@ -55,7 +52,7 @@ end
 figure()
 hold on
 
-plot(xVect(:,9),xVect(:,10),'-o')
+plot(xVect(:,7),xVect(:,8),'-o')
 
 title('varying random control inputs')
 xlabel('x position')
