@@ -86,16 +86,20 @@ CGR = rotm2axang(B2GR);
 G_FLWheelH = B2GH * B_FLWheelH;
 FLWheelT = G_FLWheelH(1:3,4);
 FLWheelR = rotm2axang(G_FLWheelH(1:3,1:3));
+FLWheelR(3) = -FLWheelR(3);
 % Front right wheel
 G_FRWheelH = B2GH * B_FRWheelH;
 FRWheelT = G_FRWheelH(1:3,4);
 FRWheelR = rotm2axang(G_FRWheelH(1:3,1:3));
+FRWheelR(3) = -FRWheelR(3);
 % Back left wheel
 G_BLWheelH = B2GH * B_BLWheelH;
 BLWheelT = G_BLWheelH(1:3,4);
 BLWheelR = rotm2axang(G_BLWheelH(1:3,1:3));
+BLWheelR(3) = -BLWheelR(3);
 % Front right wheel
 G_BRWheelH = B2GH * B_BRWheelH;
 BRWheelT = G_BRWheelH(1:3,4);
 BRWheelR = rotm2axang(G_BRWheelH(1:3,1:3));
+BRWheelR(3) = -BRWheelR(3);
 end

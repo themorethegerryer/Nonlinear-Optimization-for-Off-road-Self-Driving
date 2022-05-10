@@ -1,4 +1,4 @@
-function X1 = DynamicStepper(X0, U)
+function X1 = SingleTrackDynamicStepper(X0, U)
 single_track_car = DynamicBicycleModel();
 
 % x = [uy r ux dPsi e dFzlong delta]
