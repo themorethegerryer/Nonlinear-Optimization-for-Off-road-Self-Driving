@@ -4,66 +4,66 @@
 <head>
 </head>
 <Scene>
-<Transform DEF='CarBody'  translation='-18.33 1.17 -19.95'>
+<Transform DEF='CarBody'  translation='-27.33 1.17 -28.95'>
   <Shape DEF='CarBody_Shape' >
     <Appearance>
       <Material>
       </Material>
     </Appearance>
-    <Box DEF='CarBody_Geometry'  size='4.5 1.5 1.8'>
+    <Box DEF='CarBody_Geometry_0001'  size='4.5 1.5 1.8'>
     </Box>
   </Shape>
 </Transform>
-<Transform DEF='FRWheel'  translation='-16.08 0.42 -19.05' rotation='1 0 0 1.570796'>
+<Transform DEF='FRWheel'  translation='-25.08 0.42 -28.05' rotation='1 0 0 1.570796'>
   <Shape DEF='FRWheel_Shape' >
     <Appearance>
       <Material>
       </Material>
     </Appearance>
-    <Sphere DEF='FRWheel_Geometry'  radius='0.42'>
-    </Sphere>
+    <Cylinder DEF='FRWheel_Geometry_0001'  radius='0.42' height='0.3'>
+    </Cylinder>
   </Shape>
 </Transform>
-<Transform DEF='FLWheel'  translation='-16.08 0.42 -20.85' rotation='1 0 0 1.570796'>
+<Transform DEF='FLWheel'  translation='-25.08 0.42 -29.85' rotation='1 0 0 1.570796'>
   <Shape DEF='FLWheel_Shape' >
     <Appearance>
       <Material>
       </Material>
     </Appearance>
-    <Sphere DEF='FLWheel_Geometry_0001'  radius='0.42'>
-    </Sphere>
+    <Cylinder DEF='FLWheel_Geometry'  radius='0.42' height='0.3'>
+    </Cylinder>
   </Shape>
 </Transform>
-<Transform DEF='Terrain'  translation='-21 0 -21'>
+<Transform DEF='Terrain'  translation='-30 0 -30'>
   <Shape DEF='Terrain_Shape' >
-    <Appearance DEF='Terrain_Appearance' >
+    <Appearance DEF='Terrain_Appearance_0001' >
       <Material DEF='Terrain_Material'  specularColor='0.0955906 0.0955906 0.0955906' shininess='0.078125' diffuseColor='0.9 0.6 0.6' ambientIntensity='0.25'>
       </Material>
     </Appearance>
-    <ElevationGrid DEF='Terrain_Height'  zSpacing='3' zDimension='14' xSpacing='3' xDimension='14' solid='false' height='0 0 0 0 0.6205598 0.8626204 1.150543 0.6851168 0.09728357 0.02044185 -0.4325953 -0.5368218 -0.2542782 -0.4347416 0 0 0 0 -0.4505407 -0.255405 0.7012058 0.3043008 -0.1544466 -0.03301184 -0.220658 -0.4758736 -0.6797426 -1.70929 0.2845515 0.09495168 0.100888 0.290622 -0.3324647 -0.4577609 0.6369141 0.9835277 1.420079 0.8656741 0.4745261 -0.3614852 -0.6383832 -1.905386 0.6785111 0.6729245 -0.5063926 -0.1180485 0.1186347 -0.08510033 0.4368883 1.188663 2.063376 1.525977 0.9174672 0.517785 0.2040358 -0.8370743 1.292359 1.26734 0.01819078 -0.2570653 0.0554112 0.1813408 0.6112255 0.7105551 0.4634993 0.8271582 1.648426 2.455484 2.432608 1.385109 1.24861 1.227171 0.7042189 0.1172521 0.5987771 0.5651692 0.3015086 0.4587038 -0.1458622 0.123442 1.203397 2.005062 3.211242 3.140343 0.9759394 1.802745 1.504254 0.02911266 0.08766403 0.1993823 0.5180664 0.3830379 0.5431984 0.253413 0.3460872 0.8174781 1.646444 2.797317 1.032704 0.7633295 0.5766788 0.8480775 0.9636145 0.5712686 0.4610415 -0.03937405 -0.0342955 -0.3359362 -0.1995408 0.09640034 0.978107 1.283995 1.182629 0.5231763 0.4161936 0.5979332 0.5167651 0.454703 0.7423766 0.864688 0.09307393 -0.241751 -0.1798432 -0.2852302 0.1708461 0.7527692 1.84955 1.1808 0.4612482 0.6694561 0.08467238 -0.4150842 0.1838831 0.5720742 0.7106096 -0.2258011 -0.03584228 -0.6630527 -0.6815956 -0.2222081 2.230376 2.281412 0.7017912 0.7648754 0.6016148 0.8087873 -0.05925546 0.03825841 0.7332246 -0.1968797 -0.4084326 -0.3819321 -0.02586107 -0.007814916 2.419869 2.771537 1.795005 1.370599 0.6992254 0.7958891 0.6141001 -0.2062357 0.2645217 -0.2430491 -0.6750886 0.017738 0.140366 0.4396285 2.537482 2.467496 2.072455 1.979159 0.9855286 0.77621 1.238923 0.1617823 -0.04783941 0.1603907 -0.7635002 -0.8121158 -0.7836553 -0.206827 2.169667 2.496317 2.219228 2.078208 1.277751 1.185168 1.461048 0.9398702 0.5672167 0.311946 -0.5387114 -1.344792 -1.387129 -0.2042696' creaseAngle='3.14'>
+    <ElevationGrid DEF='Terrain_Height_0001'  zSpacing='3' zDimension='20' xSpacing='3' xDimension='20' solid='false' height='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0' creaseAngle='3.14'>
     </ElevationGrid>
   </Shape>
 </Transform>
 <Viewpoint DEF='Terrain_Viewer'  fieldOfView='0.7854' description='Terrain_Viewer' orientation='-0.03431423 -0.9810237 -0.1908273 2.337398' position='-33.31727 14.2175 -23.37343'>
 </Viewpoint>
-<Transform DEF='BLWheel'  translation='-20.58 0.42 -20.85' rotation='1 0 0 1.570796'>
+<Transform DEF='BLWheel'  translation='-29.58 0.42 -29.85' rotation='1 0 0 1.570796'>
   <Shape DEF='BLWheel_Shape' >
     <Appearance>
       <Material>
       </Material>
     </Appearance>
-    <Sphere DEF='BLWheel_Geometry'  radius='0.42'>
-    </Sphere>
+    <Cylinder DEF='BLWheel_Geometry_0001'  radius='0.42' height='0.3'>
+    </Cylinder>
   </Shape>
 </Transform>
-<Transform DEF='BRWheel'  translation='-20.58 0.42 -19.05' rotation='1 0 0 1.570796'>
+<Transform DEF='BRWheel'  translation='-29.58 0.42 -28.05' rotation='1 0 0 1.570796'>
   <Shape DEF='BRWheel_Shape' >
     <Appearance>
       <Material>
       </Material>
     </Appearance>
-    <Sphere DEF='BRWheel_Geometry'  radius='0.42'>
-    </Sphere>
+    <Cylinder DEF='BRWheel_Geometry_0001'  radius='0.42' height='0.3'>
+    </Cylinder>
   </Shape>
 </Transform>
 <Viewpoint DEF='Terrain_Viewpoint_1'  fieldOfView='0.7854' description='Terrain_Viewpoint_1' orientation='-0.03431423 -0.9810237 -0.1908273 2.337398' position='-82.00322 38.14245 -67.61453'>
