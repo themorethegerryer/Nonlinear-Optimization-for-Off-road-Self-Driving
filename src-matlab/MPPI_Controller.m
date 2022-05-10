@@ -71,7 +71,9 @@ function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
 %     u_start = ones(m,Nh);
 %     
 %     for i=1:m
-%         u_start(i,:) = u_start(i,:) * Uref(i);
+%         for j=1:cols
+%             u_start(i,j) = u_start(i,j) * Uref(i,j);
+%         end
 %     end
     
     u_perturb = zeros(m,Nh,num_samples);
