@@ -4,7 +4,7 @@ clc;
 
 % define sample state
 % x = [uy r ux dFzlong delta x y yaw]
-X_init = [0 0 0 0 pi/4 0 0 0];
+X_init = [0 0 0 0 pi/2 0 0 0];
 
 % define sample control input
 % u = [deltadot Fxf_enginebrake Fxr]

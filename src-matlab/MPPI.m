@@ -12,19 +12,19 @@ close all
 %   X:
 %       7: steering angle +/- 45 deg = pi/4 rad
 
-Nh = 20; %Rollout Horizon
+Nh = 25; %Rollout Horizon
 % max_velocity = 15; % = 33.554mph
 dt = 0.1;
 
-x0 = [0 0 0 0 0 0 0 0]';
+x0 = [0 0 0 0 pi/4 0 0 0]';
 
 % Create double track model
 model = DynamicBicycleModel();
 
 % Create reference trajectory
 % [Xref, Uref, times] = genRefTraj_simplified(x0, xf, u_const, max_velocity, dt);
-Xref = [0 0 0.01 0 0 0 0 0]';
-posRef = [4 0 0]';
+Xref = [0.01 0 0 0 0 0 0 0]';
+posRef = [4 4 0]';
 Uref = [0 0 0]';
 
 % n = length(Xref(:,1));
@@ -33,13 +33,13 @@ Uref = [0 0 0]';
 n = length(Xref);
 npos = 3;
 m = length(Uref);
-N = 800;
+N = 2000;
 
 % Define constraints
 % xmin = [-Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -pi/4]';
 % xmax = [Inf, Inf, Inf, Inf, Inf, Inf, pi/4]';
-umin = [-0.1, -400, 0]';
-umax = [0.1, 400, 0]';
+umin = [-0.2, -400, 0]';
+umax = [0.2, 400, 0]';
 
 % Define LQR costs... but for MPC
 Q = diag([0 0 0 0 0 0 0 0]);
@@ -47,13 +47,13 @@ R = diag([0 0 0]);
 % Q = diag([0 0 1 0 0 0 0]);
 % R = diag([0 0 0 0]);
 % xpos ypos yaw
-Qpos = diag([10 1 0]);
+Qpos = diag([10 10 0]);
 
 % Create MPPI Controller
 x_pos = zeros(N,1);
 y_pos = zeros(N,1);
 yaw_pos = zeros(N,1);
-num_samples = 700;
+num_samples = 600;
 X = zeros(n,N);
 U = zeros(m,N-1);
 X(:,1) = x0;
@@ -77,7 +77,7 @@ for k = 1:N-1
     xpos_rollout = zeros(npos,Nhu+1);
     xpos_rollout(:,1) = [x_pos(k) ; y_pos(k); yaw_pos(k)];
     cost = zeros(num_samples,1);
-    gamma = 0.9;
+    gamma = 1.0;
     for kk = 1:num_samples
         u_rollout = u_start+u_perturb(:,:,kk);
         for kkk = 1:Nhu
