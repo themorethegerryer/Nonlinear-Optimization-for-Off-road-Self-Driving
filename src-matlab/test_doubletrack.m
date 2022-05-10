@@ -9,7 +9,7 @@ X_init = [0, ... % uy
     0, ... % ux
     0, ... % dFzlong
     0, ... % dFzlat
-    0.1, ... % delta
+    0, ... % delta
     0, ... % x-position
     0, ... % y-position
     0]; % r
@@ -17,9 +17,8 @@ X_init = [0, ... % uy
 % define sample control input
 % u = [deltadot Fxfbrake Fxr Fengine udiff]
 U_init = [0, ... % deltadot
-    0, ... % Fxfbrake
-    0, ... % Fxr
-    100]; % Fengine
+    100, ... % Fxf_enginebrake
+    0]; % Fxr
 
 double_track_car = DoubleTrackModel();
 
