@@ -48,4 +48,6 @@ Terrain_std = std([FLGrad, FRGrad, BLGrad, BRGrad]);
 Axle_std = std([FAxleGrad, BAxleGrad]);
 Side_std = std([LSideGrad, RSideGrad]);
 costVector = [Terrain_std, Axle_std, Side_std];
+
+Grad_Terrain_std = 0;
 end
