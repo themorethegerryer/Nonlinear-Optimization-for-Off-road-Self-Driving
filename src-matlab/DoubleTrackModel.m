@@ -69,9 +69,8 @@ classdef DoubleTrackModel
             delta = x(6);
     
             deltadot = u(1);
-            Fxfbrake = -u(2);
-            Fxr = -u(3);
-            Fengine = u(4);
+            Fxf_enginebrake = u(2);
+            Fxr = u(3);
 %             udiff = u(5); % TODO differential is always open
 
 %             slip_bundle = slip_function(car, x);
@@ -91,10 +90,10 @@ classdef DoubleTrackModel
             gy = 0;
             gz = -9.81;
 
-            Fxflbrake = Fxfbrake/2; % Fxflbrake
-            Fxfrbrake = Fxfbrake/2; % Fxfrbrake
-            Fxrl = -Fxr/2; % 
-            Fxrr = -Fxr/2;
+            Fxfl_enginebrake = Fxf_enginebrake/2; % Fxflbrake
+            Fxfr_enginebrake = Fxf_enginebrake/2; % Fxfrbrake
+            Fxrl = Fxr/2; % 
+            Fxrr = Fxr/2;
 
             % compute Fz of each tire
             % wheelFz_bundle: [Fzfl, Fzfr, Fzrl, Fzrr]
@@ -190,8 +189,8 @@ classdef DoubleTrackModel
             term1 = 0.5*(tire_mu*Fz - Fx);
             term2_1 = (1 - (abs(Fx)/(tire_mu*Fz))^car.n_coup)^(1/car.n_coup);
             term2_2 = tire_normal_stiffness-(0.5*tire_mu*Fz);
-%             tire_corner_stiffness = term1 + (term2_1*term2_2);
-            tire_corner_stiffness = term1;
+            tire_corner_stiffness = term1 + (term2_1*term2_2);
+%             tire_corner_stiffness = term1;
         end
 
         function tire_mu = tire_friction(car,Fz)
@@ -210,14 +209,13 @@ classdef DoubleTrackModel
             % compute longitudinal force Fx
             % assume constant open differential
             Fwheel = zeros(1,8);
-            torque_engine = u(4);
-            Fxfbrake = u(2);
-            Fxr = -u(3);
+            torque_enginebrake = u(2);
+            Fxr = u(3);
 
-            Fxfl = torque_engine/2 - (Fxfbrake/2);
-            Fxfr = torque_engine/2 - (Fxfbrake/2);
-            Fxrl = -Fxr/2;
-            Fxrr = -Fxr/2;
+            Fxfl = torque_enginebrake/2;
+            Fxfr = torque_enginebrake/2;
+            Fxrl = Fxr/2;
+            Fxrr = Fxr/2;
 
             Fwheel(1) = Fxfl;
             Fwheel(2) = Fxfr;
