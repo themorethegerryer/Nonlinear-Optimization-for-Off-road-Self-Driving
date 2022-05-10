@@ -5,7 +5,7 @@ single_track_car = DoubleTrackModel();
 % u = [deltadot Fxfbrake Fxr Fengine]
 
 % step through dynamics 
-dt = 0.01;
+dt = 0.1;
 % xpos = zeros(size(t));
 % ypos = zeros(size(t));
 
