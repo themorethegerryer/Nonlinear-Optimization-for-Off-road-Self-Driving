@@ -37,11 +37,10 @@ classdef DynamicBicycleModel
         end
         
         function dxdt = continuous_dynamics(car, x, u)% ax, ay, rdot, wdot
-        % x = [uy r ux dFzlong delta x y yaw]
+        % x = [uy r ux delta x y yaw]
         % uy: vehicle's lateral velocity ~ 1 m/s
         % r: yaw rate ~ 0.1 rad/s
         % ux: vehicle's longitudinal velocity (straight forward) ~ 1 m/s
-        % dFzlong: longitudinal load transfer ~ 500 N
         % delta: current steering angle ~ 0.1 rad
         %
         % u = [deltadot Fxf_enginebrake Fxr]
@@ -55,8 +54,8 @@ classdef DynamicBicycleModel
             uy = x(1);
             r = x(2);
             ux = x(3);
-            dFzlong = x(4);
-            delta = x(5);
+%             dFzlong = x(4);
+            delta = x(4);
 
             deltadot = u(1);
             Fxf_enginebrake = u(2);
@@ -97,21 +96,21 @@ classdef DynamicBicycleModel
             % dux/dt - Page 95
             dxdt(3) = ((Fxf*cos(delta)+Fxr-Fyf*sin(delta)-Fdrag)/car.m) + r*uy-q*uz+gx;
 
-            % ddFzlong/dt - Page 96
-            %confirm that h = hcg here
-            dxdt(4) = -car.Klong*(dFzlong+((p*r*(car.Izz-car.Ixx))/car.L)-((car.hcg*(Fxf*cos(delta)+Fxr-Fyf*sin(delta))+car.Iyy*qdot)/car.L));
+%             % ddFzlong/dt - Page 96
+%             %confirm that h = hcg here
+%             dxdt(4) = -car.Klong*(dFzlong+((p*r*(car.Izz-car.Ixx))/car.L)-((car.hcg*(Fxf*cos(delta)+Fxr-Fyf*sin(delta))+car.Iyy*qdot)/car.L));
 
             % ddelta/dt
-            dxdt(5) = deltadot;
+            dxdt(4) = deltadot;
 
             % dx/dt
-            dxdt(6) = x(3);
+            dxdt(5) = x(3);
 
             % dy/dt
-            dxdt(7) = x(1);
+            dxdt(6) = x(1);
 
             % dyaw/dt
-            dxdt(8) = x(2);
+            dxdt(7) = x(2);
         end
         
         function x_next = dynamics_rk4(car,x,u,dt)
@@ -160,16 +159,16 @@ classdef DynamicBicycleModel
             Fz_bundle(2) = (((car.a/car.L)*Fz + x(4))/2); % eq 4.15
         end
 
-        function tire_corner_stiffness = cornering_stiffness(car, tire_mu, tire_normal_stiffness, n_coup, Fz, Fx) % eq 4.20
-            % TODO replace Fx with the state of the car
-            % x = [uy r ux dFzlong delta x y yaw]
-            % u = [deltadot Fxfbrake Fxr Fengine]
-            
-            term1 = 0.5*(tire_mu*Fz - Fx);
-            term2_1 = (1 - (abs(Fx)/(tire_mu*Fz))^n_coup)^(1/n_coup);
-            term2_2 = tire_normal_stiffness-(0.5*tire_mu*Fz);
-            tire_corner_stiffness = term1 + (term2_1*term2_2);
-        end
+%         function tire_corner_stiffness = cornering_stiffness(car, tire_mu, tire_normal_stiffness, n_coup, Fz, Fx) % eq 4.20
+%             % TODO replace Fx with the state of the car
+%             % x = [uy r ux dFzlong delta x y yaw]
+%             % u = [deltadot Fxfbrake Fxr Fengine]
+%             
+%             term1 = 0.5*(tire_mu*Fz - Fx);
+%             term2_1 = (1 - (abs(Fx)/(tire_mu*Fz))^n_coup)^(1/n_coup);
+%             term2_2 = tire_normal_stiffness-(0.5*tire_mu*Fz);
+%             tire_corner_stiffness = term1 + (term2_1*term2_2);
+%         end
         
         function Fwheel = tire_model(car, Fz_bundle, x, u) 
             % x = [uy r ux dFzlong delta x y yaw]
@@ -187,54 +186,56 @@ classdef DynamicBicycleModel
 
             Fwheel(1) = Fxf;
             Fwheel(2) = Fxr;
+            Fwheel(3) = 0; % Fyf
+            Fwheel(4) = 0; % Fyr
 
             % compute the slip
-            slip_angle_bundle = slip_function(car, x);
+%             slip_angle_bundle = slip_function(car, x);
 
-            % compute Fyf
-            c_stiffness_f = car.cornering_stiffness(car.mu_f, car.Calpha_f, car.n_f, Fz_bundle(1), Fxf);
-            Fyf_max = sqrt((car.mu_f*Fz_bundle(1))^2 - Fxf); % eq. 4.17
-            alpha_slide_f = (3*Fyf_max) / c_stiffness_f; % eq 4.18
-            Fwheel(3) = -c_stiffness_f*tan(slip_angle_bundle(1)) + (c_stiffness_f^2 / (3*Fyf_max))*tan(slip_angle_bundle(1))*abs(tan(slip_angle_bundle(1)));
-            if abs(slip_angle_bundle(1)) <= alpha_slide_f
-                Fwheel(3) = Fwheel(3) - (c_stiffness_f^3 / (27*Fyf_max^2))*tan(slip_angle_bundle(1))^3;
-            else
-                Fwheel(3) = Fwheel(3) - Fyf_max*sign(slip_angle_bundle(1));
-            end
-
-            % compute Fyr
-            c_stiffness_r = car.cornering_stiffness(car.mu_r, car.Calpha_r, car.n_r, Fz_bundle(2), Fxr);
-            Fyr_max = sqrt((car.mu_r*Fz_bundle(2))^2 - Fxr); % eq. 4.17
-            alpha_slide_r = (3*Fyr_max) / c_stiffness_r; % eq 4.18
-            Fwheel(4) = -c_stiffness_r*tan(slip_angle_bundle(2)) + (c_stiffness_r^2 / (3*Fyr_max))*tan(slip_angle_bundle(2))*abs(tan(slip_angle_bundle(2)));
-            if abs(slip_angle_bundle(2)) <= alpha_slide_r
-                Fwheel(4) = Fwheel(4) - (c_stiffness_r^3 / (27*Fyr_max^2))*tan(slip_angle_bundle(2))^3;
-            else
-                Fwheel(4) = Fwheel(4) - Fyr_max*sign(slip_angle_bundle(2));
-            end
+%             % compute Fyf
+%             c_stiffness_f = car.cornering_stiffness(car.mu_f, car.Calpha_f, car.n_f, Fz_bundle(1), Fxf);
+%             Fyf_max = sqrt((car.mu_f*Fz_bundle(1))^2 - Fxf); % eq. 4.17
+%             alpha_slide_f = (3*Fyf_max) / c_stiffness_f; % eq 4.18
+%             Fwheel(3) = -c_stiffness_f*tan(slip_angle_bundle(1)) + (c_stiffness_f^2 / (3*Fyf_max))*tan(slip_angle_bundle(1))*abs(tan(slip_angle_bundle(1)));
+%             if abs(slip_angle_bundle(1)) <= alpha_slide_f
+%                 Fwheel(3) = Fwheel(3) - (c_stiffness_f^3 / (27*Fyf_max^2))*tan(slip_angle_bundle(1))^3;
+%             else
+%                 Fwheel(3) = Fwheel(3) - Fyf_max*sign(slip_angle_bundle(1));
+%             end
+% 
+%             % compute Fyr
+%             c_stiffness_r = car.cornering_stiffness(car.mu_r, car.Calpha_r, car.n_r, Fz_bundle(2), Fxr);
+%             Fyr_max = sqrt((car.mu_r*Fz_bundle(2))^2 - Fxr); % eq. 4.17
+%             alpha_slide_r = (3*Fyr_max) / c_stiffness_r; % eq 4.18
+%             Fwheel(4) = -c_stiffness_r*tan(slip_angle_bundle(2)) + (c_stiffness_r^2 / (3*Fyr_max))*tan(slip_angle_bundle(2))*abs(tan(slip_angle_bundle(2)));
+%             if abs(slip_angle_bundle(2)) <= alpha_slide_r
+%                 Fwheel(4) = Fwheel(4) - (c_stiffness_r^3 / (27*Fyr_max^2))*tan(slip_angle_bundle(2))^3;
+%             else
+%                 Fwheel(4) = Fwheel(4) - Fyr_max*sign(slip_angle_bundle(2));
+%             end
         end
 
-        function sideSlip = slip_function(car, x) % POTENTIALLY TOXIC
-            % x = [uy r ux dFzlong delta x y yaw]
-            % u = [deltadot Fxfbrake Fxr Fengine]
-            sideSlip = zeros(2);
-%             r = x(2);
-            Vx = x(3);
-            Vy = x(1);
-%             theta = ackermann_turn(car, U(1));
-            steering_angle = x(4);
-            
-            % compute sideSlip for each wheel
-            sideSlip_f = 0;%steering_angle - atan((Vy+ car.a*r)/Vx);
-            sideSlip_r = 0;% - atan((Vy- car.b*r)/Vx);
-
-            sideSlip(1) = sideSlip_f;
-            sideSlip(2) = sideSlip_r;
-
-%             sideSlip = [sideSlip_f sideSlip_r];
-            % set NaN values to zero (i.e. car moving foward)
-            sideSlip(isnan(sideSlip)) = 0;
-        end
+%         function sideSlip = slip_function(car, x) % POTENTIALLY TOXIC
+%             % x = [uy r ux dFzlong delta x y yaw]
+%             % u = [deltadot Fxfbrake Fxr Fengine]
+%             sideSlip = zeros(2);
+% %             r = x(2);
+%             Vx = x(3);
+%             Vy = x(1);
+% %             theta = ackermann_turn(car, U(1));
+%             steering_angle = x(4);
+%             
+%             % compute sideSlip for each wheel
+%             sideSlip_f = 0;%steering_angle - atan((Vy+ car.a*r)/Vx);
+%             sideSlip_r = 0;% - atan((Vy- car.b*r)/Vx);
+% 
+%             sideSlip(1) = sideSlip_f;
+%             sideSlip(2) = sideSlip_r;
+% 
+% %             sideSlip = [sideSlip_f sideSlip_r];
+%             % set NaN values to zero (i.e. car moving foward)
+%             sideSlip(isnan(sideSlip)) = 0;
+%         end
     end
 end
 

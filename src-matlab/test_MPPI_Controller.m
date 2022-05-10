@@ -2,13 +2,14 @@ clc
 clear all
 close all
 
-model = DynamicBicycleModel();
+model = KinematicBicycleModel();
 
 dt = 0.1;
 
-x0 = [0 0 0 0 0 0 0 0 0]';
-Xref = [0.01 0 0.01 0 0 0 2 0 0]';
-Uref = [0 0 0]';
+x0 = [0 0 0]';
+Xref = [20 20 0]';
+x0(end) = atan2(Xref(2), Xref(1));
+Uref = [0 0]';
 
 N = 300;
 n = length(Xref);
@@ -19,18 +20,19 @@ U = zeros(m,N);
 X(:,1) = x0;
 U(:,1) = Uref;
 
-Uhorizon = Uref.*ones(3,25);
+Uhorizon = Uref.*ones(m,25);
 
 for k=1:N-1
     disp(k)
     [U(:,k+1), Uhorizon] = MPPI_Controller(X(:,k), Xref, Uhorizon);
     X(:,k+1) = model.dynamics_rk4(X(:,k)', U(:,k+1)', dt);
-    [X(6,k+1) X(7,k+1)]
+    [X(1,k+1) X(2,k+1) U(1,k+1)]
 end
 
 figure(1)
 hold on
-plot(X(6,:),X(7,:), '-o')
+plot(X(1,:),X(2,:), '-o', Color='blue')
+plot(Xref(1), Xref(2), 'x', Color='red')
 hold off
 xlabel('x position')
 ylabel('y position')
