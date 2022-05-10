@@ -58,12 +58,11 @@ costVector = [Terrain_std, Axle_std, Side_std];
 
 % Terrain_std = std([FLGrad, FRGrad, BLGrad, BRGrad]);
 % FLGrad = cos(FWheelYaw) * datamap(FLx, FLy, 2) + sin(FWheelYaw) * datamap(FLx, FLy, 3);
-dFLGrad_dyaw = -sin(yaw+delta)*datamap(FLx, FLy, 2) + cos(yaw+delta)*datamap(FLx, FLy, 3);
-dFLGrad_dr = -cos(yaw+delta)*datamap(FLx, FLy, 2) - sin(yaw+delta)*datamap(FLx, FLy, 3);
-d2FLGrad_dr2 = sin(yaw+delta)*datamap(FLx, FLy, 2) - cos(yaw+delta)*datamap(FLx, FLy, 3);
-dFLGrad_dx = [0 dFLGrad_dr 0 0 dFLGrad_dyaw 0 0 dFLGrad_dyaw];
-d2FLGrad_dx2 = [0 d2FLGrad_dr2 0 0 dFLGrad_dr 0 0 dFLGrad_dr];
-% How does this convert to standard deviation?
+FLGrad_dyaw = -sin(yaw+delta)*datamap(FLx, FLy, 2) + cos(yaw+delta)*datamap(FLx, FLy, 3);
+FLGrad_dr = -cos(yaw+delta)*datamap(FLx, FLy, 2) - sin(yaw+delta)*datamap(FLx, FLy, 3);
+FL2Grad_dr2 = sin(yaw+delta)*datamap(FLx, FLy, 2) - cos(yaw+delta)*datamap(FLx, FLy, 3);
+dFLGrad_dx = [0 FLGrad_dr 0 0 FLGrad_dyaw 0 0 FLGrad_dyaw];
+d2FLGrad
 dTerrain_std__duy = 0;
 dTerrain_std__dr = ;
 
