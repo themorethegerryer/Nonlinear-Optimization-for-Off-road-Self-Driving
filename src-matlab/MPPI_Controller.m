@@ -4,14 +4,14 @@ function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
 % Xref: reference state of DoubleTrackModel car
 % Uref: reference control input
 
-%     X = [XDouble(1:3) ; XDouble(6:9)];
-%     Xref = [XrefDouble(1:3) ; XrefDouble(6:9)];
+    X = [XDouble(1:3) ; XDouble(6:9)];
+    Xref = [XrefDouble(1:3) ; XrefDouble(6:9)];
 
 %     X = XDouble(7:9);
 %     Xref = XrefDouble(7:9);
 
-    X = XDouble;
-    Xref = XrefDouble;
+%     X = XDouble;
+%     Xref = XrefDouble;
 
     % define DynamicBicycleModel car
     model = KinematicBicycleModel();
@@ -46,8 +46,9 @@ function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
 %     else
 %         numStepsToGoal = (distanceFromGoal/generalSpeed)/dt;
 %     end
-    uref_internal = zeros(m,Nh);
+%     uref_internal = zeros(m,Nh);
     u_start = zeros(m,Nh);
+%     u_start = Uref;
 %     if numStepsToGoal >= Nh
 %         u_start(2,:) = ones(1,Nh).*heuristicThrottle;
 %     elseif numStepsToGoal > 1 && numStepsToGoal < Nh
@@ -87,7 +88,7 @@ function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
         u_rollout = u_start+u_perturb(:,:,k);
         for kk=1:Nh-1
             x_rollout(:,kk+1) = model.dynamics_rk4(x_rollout(:,kk)', u_rollout(:,kk)', dt);
-            costs(k) = costs(k) + gamma^(kk-1)*(0.5*(x_rollout(:,kk+1)-Xref)'*Q*(x_rollout(:,kk+1)-Xref) + 0.5*(u_rollout(:,kk)-uref_internal(:,kk))'*R*(u_rollout(:,kk)-uref_internal(:,kk)));
+            costs(k) = costs(k) + gamma^(kk-1)*(0.5*(x_rollout(:,kk+1)-Xref)'*Q*(x_rollout(:,kk+1)-Xref) + 0.5*(u_rollout(:,kk)-u_start(:,kk))'*R*(u_rollout(:,kk)-u_start(:,kk)));
         end
     end
 
