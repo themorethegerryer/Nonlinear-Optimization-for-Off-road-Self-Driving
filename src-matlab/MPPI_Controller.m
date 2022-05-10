@@ -1,4 +1,4 @@
-function control = MPPI_Controller(XDouble, XrefDouble, Uref)
+function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
 % inputs:
 % X: current state of DoubleTrackModel car
 % Xref: reference state of DoubleTrackModel car
@@ -14,7 +14,8 @@ function control = MPPI_Controller(XDouble, XrefDouble, Uref)
     Nh = 25; %Rollout Horizon
     dt = 0.1;
     n = length(Xref);
-    m = length(Uref);
+    [m, cols] = size(Uref);
+%     m = length(Uref);
     gamma = 0.75; % discount factor
     num_samples = 600; % Number of sampled trajectories
     
@@ -29,11 +30,12 @@ function control = MPPI_Controller(XDouble, XrefDouble, Uref)
     costs = zeros(num_samples,1);
 
 %     u_start = Uref.*ones(m,Nh);
-    u_start = ones(m,Nh);
-    
-    for i=1:m
-        u_start(i,:) = u_start(i,:) * Uref(i);
-    end
+    u_start = Uref;
+%     u_start = ones(m,Nh);
+%     
+%     for i=1:m
+%         u_start(i,:) = u_start(i,:) * Uref(i);
+%     end
     
     u_perturb = zeros(m,Nh,num_samples);
     u_perturb(1,:,:) = ((umax(1)-umin(1)).*rand(num_samples,Nh)+umin(1))';
@@ -51,7 +53,7 @@ function control = MPPI_Controller(XDouble, XrefDouble, Uref)
         u_rollout = u_start+u_perturb(:,:,k);
         for kk=1:Nh-1
             x_rollout(:,kk+1) = model.dynamics_rk4(x_rollout(:,kk)', u_rollout(:,kk)', dt);
-            costs(k) = costs(k) + gamma^(kk-1)*(0.5*(x_rollout(:,kk+1)-Xref)'*Q*(x_rollout(:,kk+1)-Xref) + 0.5*(u_rollout(:,kk)-Uref)'*R*(u_rollout(:,kk)-Uref));
+            costs(k) = costs(k) + gamma^(kk-1)*(0.5*(x_rollout(:,kk+1)-Xref)'*Q*(x_rollout(:,kk+1)-Xref) + 0.5*(u_rollout(:,kk)-Uref(:,kk))'*R*(u_rollout(:,kk)-Uref(:,kk)));
         end
     end
 
@@ -65,7 +67,7 @@ function control = MPPI_Controller(XDouble, XrefDouble, Uref)
         weighted_traj(:,:,uk) = weight*u_perturb(:,:,uk);
     end
 
-%     [mean(costs)]
+    [mean(costs)]
     control_Nh = u_start+(sum(weighted_traj,3)/sum_weights);
     control = control_Nh(:,1);
 end
