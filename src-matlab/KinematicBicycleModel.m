@@ -42,9 +42,9 @@ classdef KinematicBicycleModel
         % y: global y position
         % theta: heading (angle from global x-axis)
         %
-        % u = [deltadot acc]
+        % u = [delta v]
+        % delta: steering angle
         % v: forward velocity of back tire
-        % alpha: steering angle
             dxdt = zeros(size(x));
             
             theta = x(3);
