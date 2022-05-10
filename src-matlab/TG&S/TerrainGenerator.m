@@ -1,11 +1,11 @@
 % Parameter Initialization
 % Terrain Parameters
-terrain_x_indices = 20;
-terrain_y_indices = 30;
-terrain_x_scale = 10;
-terrain_y_scale = 10;
-grad_scale = 0.3; % z + prev_grad * grad_scale
-terrain_scale = 0.9;  % z + terrain_scale * gaussian(0,1)
+terrain_x_indices = 150;
+terrain_y_indices = 150;
+terrain_x_scale = 2;
+terrain_y_scale = 2;
+grad_scale = 0.1; % z + prev_grad * grad_scale
+terrain_scale = 0.4;  % z + terrain_scale * gaussian(0,1)
 % Car Parameters
 tire_width = 0.3;
 tire_radius = 0.42;              % effective tire radius (m)
