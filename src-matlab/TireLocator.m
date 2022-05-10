@@ -45,6 +45,16 @@ CGy_indices = (CGy - terrain_translation(3)) / terrain_y_scale;
 CGz = 0;
 CGx_indices;
 CGy_indices;
+if CGx_indices < 1
+    CGx_indices = 1;
+elseif CGx_indices > terrain_x_indices
+    CGx_indices = terrain_x_indices;
+end
+if CGy_indices < 1
+    CGy_indices = 1;
+elseif CGy_indices > terrain_y_indices
+    CGy_indices = terrain_y_indices;
+end
 upper_left_z = data_map(floor(CGx_indices), ceil(CGy_indices), 1);
 lower_right_z = data_map(ceil(CGx_indices), floor(CGy_indices), 1);
 if CGx_indices - floor(CGx_indices) + CGy_indices - floor(CGy_indices) <= 1
@@ -70,13 +80,13 @@ y_angle;
 CGpitch = cos(CGyaw) * x_angle + sin(CGyaw) * y_angle;
 CGroll = sin(CGyaw) * x_angle + cos(CGyaw) * y_angle;
 YawMat = eul2rotm([-CGyaw, 0, 0], 'ZYX');
-Pitchmat = eul2rotm([0, CGpitch, 0], 'ZYX');
+Pitchmat = eul2rotm([0, -CGpitch, 0], 'ZYX');
 Rollmat = eul2rotm([0, 0, CGroll], 'ZYX');
 B2GR = Rollmat * Pitchmat * YawMat;
 B2GH = [B2GR, B2GT'; 0, 0, 0, 1];
 CGT = B2GT;
 YawMat = eul2rotm([CGyaw, 0, 0], 'ZYX');
-Pitchmat = eul2rotm([0, -CGpitch, 0], 'ZYX');
+Pitchmat = eul2rotm([0, CGpitch, 0], 'ZYX');
 Rollmat = eul2rotm([0, 0, -CGroll], 'ZYX');
 B2GR = Rollmat * Pitchmat * YawMat;
 CGR = rotm2axang(B2GR);
