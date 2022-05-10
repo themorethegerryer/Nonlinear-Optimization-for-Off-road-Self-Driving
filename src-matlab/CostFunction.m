@@ -1,7 +1,7 @@
 function [costVector] = CostFunction(FLWheelT, FRWheelT, BLWheelT, BRWheelT, FWheelYaw, BWheelYaw)
 % Wheel translations in terms of z height
 % Terrain values in terms of y height
-
+[0 0 0]
 % Front wheel yaw is vehicle yaw plus delta (slip angle)
 
 % Load in terrain parameters

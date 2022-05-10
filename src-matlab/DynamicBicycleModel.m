@@ -179,7 +179,7 @@ classdef DynamicBicycleModel
 
             % compute longitudinal force Fx
             % assume constant open differential
-            Fwheel = zeros(1,3);
+            Fwheel = zeros(1,4);
 
             engine_brake = u(2);
             Fxf = engine_brake;

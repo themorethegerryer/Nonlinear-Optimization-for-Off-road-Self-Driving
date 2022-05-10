@@ -1,11 +1,11 @@
 % Parameter Initialization
 % Terrain Parameters
-terrain_x_indices = 50;
-terrain_y_indices = 50;
-terrain_x_scale = 2;
-terrain_y_scale = 2;
-grad_scale = 0.2; %0.3; % z + prev_grad * grad_scale
-terrain_scale = 0.3; %0.4;  % z + terrain_scale * gaussian(0,1)
+terrain_x_indices = 20;
+terrain_y_indices = 20;
+terrain_x_scale = 3;
+terrain_y_scale = 3;
+grad_scale = 0.3; % z + prev_grad * grad_scale
+terrain_scale = 0.5;  % z + terrain_scale * gaussian(0,1)
 % Car Parameters
 tire_width = 0.3;
 tire_radius = 0.42;              % effective tire radius (m)
@@ -62,19 +62,19 @@ CarBody_geo = vrnode(CarBody_shape, 'geometry', 'CarBody_Geometry','Box');
 % FLWheel
 CarFLWheel_node = vrnode(myworld, 'FLWheel');
 CarFLWheel_shape = vrnode(myworld, 'FLWheel_Shape');
-CarFLWheel_geo = vrnode(CarFLWheel_shape, 'geometry', 'FLWheel_Geometry','Cylinder');
+CarFLWheel_geo = vrnode(CarFLWheel_shape, 'geometry', 'FLWheel_Geometry','Sphere');
 % FRWheel
 CarFRWheel_node = vrnode(myworld, 'FRWheel');
 CarFRWheel_shape = vrnode(myworld, 'FRWheel_Shape');
-CarFRWheel_geo = vrnode(CarFRWheel_shape, 'geometry', 'FRWheel_Geometry','Cylinder');
+CarFRWheel_geo = vrnode(CarFRWheel_shape, 'geometry', 'FRWheel_Geometry','Sphere');
 % BLWheel
 CarBLWheel_node = vrnode(myworld, 'BLWheel');
 CarBLWheel_shape = vrnode(myworld, 'BLWheel_Shape');
-CarBLWheel_geo = vrnode(CarBLWheel_shape, 'geometry', 'BLWheel_Geometry','Cylinder');
+CarBLWheel_geo = vrnode(CarBLWheel_shape, 'geometry', 'BLWheel_Geometry','Sphere');
 % BRWheel
 CarBRWheel_node = vrnode(myworld, 'BRWheel');
 CarBRWheel_shape = vrnode(myworld, 'BRWheel_Shape');
-CarBRWheel_geo = vrnode(CarBRWheel_shape, 'geometry', 'BRWheel_Geometry','Cylinder');
+CarBRWheel_geo = vrnode(CarBRWheel_shape, 'geometry', 'BRWheel_Geometry','Sphere');
 % Create Terrain handles
 Terrain_node = vrnode(myworld, 'Terrain');
 Terrain_shape = vrnode(myworld, 'Terrain_Shape');
@@ -119,22 +119,22 @@ CarBody_geo.size = [car_length, car_height, car_width];
 % FL Wheel
 CarFLWheel_node.translation = [-terrain_x_indices/2*terrain_x_scale+car_length+tire_radius, tire_radius, -terrain_y_indices/2*terrain_y_scale+0.5*tire_width];
 CarFLWheel_node.rotation = [1, 0, 0, pi/2];
-CarFLWheel_geo.height = tire_width;
+% CarFLWheel_geo.height = tire_width;
 CarFLWheel_geo.radius = tire_radius;
 % FR Wheel
 CarFRWheel_node.translation = [-terrain_x_indices/2*terrain_x_scale+car_length+tire_radius, tire_radius, -terrain_y_indices/2*terrain_y_scale+car_width+0.5*tire_width];
 CarFRWheel_node.rotation = [1, 0, 0, pi/2];
-CarFRWheel_geo.height = tire_width;
+% CarFRWheel_geo.height = tire_width;
 CarFRWheel_geo.radius = tire_radius;
 % BL Wheel
 CarBLWheel_node.translation = [-terrain_x_indices/2*terrain_x_scale+tire_radius, tire_radius, -terrain_y_indices/2*terrain_y_scale+0.5*tire_width];
 CarBLWheel_node.rotation = [1, 0, 0, pi/2];
-CarBLWheel_geo.height = tire_width;
+% CarBLWheel_geo.height = tire_width;
 CarBLWheel_geo.radius = tire_radius;
 % BR Wheel
 CarBRWheel_node.translation = [-terrain_x_indices/2*terrain_x_scale+tire_radius, tire_radius, -terrain_y_indices/2*terrain_y_scale+car_width+0.5*tire_width];
 CarBRWheel_node.rotation = [1, 0, 0, pi/2];
-CarBRWheel_geo.height = tire_width;
+% CarBRWheel_geo.height = tire_width;
 CarBRWheel_geo.radius = tire_radius;
 
 % Place Car in Center of Terrain
