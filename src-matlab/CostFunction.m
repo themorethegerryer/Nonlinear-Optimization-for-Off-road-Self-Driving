@@ -1,4 +1,4 @@
-function [costVector] = CostFunction(X0, car)
+function [costVector, costGrad, costHess] = CostFunction(X0, car)
 % Wheel translations in terms of z height
 % Terrain values in terms of y height
 
@@ -63,12 +63,17 @@ costVector = [Terrain_std, Axle_std, Side_std];
 
 % Calculate the cost derivative for each state numerically
 costGrad = zeros(length(costVector), length(x0));
+costGrad2 = zeros(length(costVector), length(x0));
 costHess = zeros(length(costVector), length(x0));
 derivative_step = 0.1;
-for jj=1:length(x0)
+for jj=1:2
     for ii=1:length(x0)
         temp_x0 = x0;
-        temp_x0(ii) = temp_x0(ii) + 0.1;
+        if jj == 0
+            temp_x0(ii) = temp_x0(ii) + derivative_step;
+        else
+            temp_x0(ii) = temp_x0(ii) + 2 * derivative_step;
+        end
         % Calculate the stepped tire positions
         delta = temp_x0(6);
         CGx = temp_x0(7);
@@ -84,39 +89,43 @@ for jj=1:length(x0)
         Axle_std = std([FAxleGrad, BAxleGrad]);
         Side_std = std([LSideGrad, RSideGrad]);
         stepped_costVector = [Terrain_std, Axle_std, Side_std];
-        costGrad(1:end,ii) = (stepped_costVector' - costVector') / derivative_step;
+        if jj == 0
+            costGrad(1:end,ii) = (stepped_costVector' - costVector') / derivative_step;
+        else
+            costGrad2(1:end,ii) = (stepped_costVector' - costVector') / (2 * derivative_step);
+        end
     end
-    costHess = 0;
+    costHess = (costGrad2 - costGrad) / derivative_step;
 end
 
 %%% Attempts at Analytical cost differentiation
 
-% x = [uy r ux dFzlong delta x y yaw]
-% y-velocity, yaw-dot, x-velocity, longitudinal load transfer, steering
-% angle, x, y, yaw
-% u = [deltadot Fxf_enginebrake Fxr]
-% yaw-dot, engine force, rear braking force
-% Costs: Terrain_std, Axle_std, Side_std
-
-% Terrain_std = std([FLGrad, FRGrad, BLGrad, BRGrad]);
-% FLGrad = cos(FWheelYaw) * datamap(FLx, FLy, 2) + sin(FWheelYaw) * datamap(FLx, FLy, 3);
-dFLGrad_dyaw = -sin(yaw+delta)*datamap(FLx, FLy, 2) + cos(yaw+delta)*datamap(FLx, FLy, 3);
-dFLGrad_dr = -cos(yaw+delta)*datamap(FLx, FLy, 2) - sin(yaw+delta)*datamap(FLx, FLy, 3);
-d2FLGrad_dr2 = sin(yaw+delta)*datamap(FLx, FLy, 2) - cos(yaw+delta)*datamap(FLx, FLy, 3);
-dFLGrad_dx = [0 dFLGrad_dr 0 0 dFLGrad_dyaw 0 0 dFLGrad_dyaw];
-d2FLGrad_dx2 = [0 d2FLGrad_dr2 0 0 dFLGrad_dr 0 0 dFLGrad_dr];
-% How does this convert to standard deviation?
-% std = sqrt((SUM(x - mu))^2 / N)
-dstd/dx = 
-dTerrain_std__duy = 0;
-dTerrain_std__dr = ;
-
-Grad_Terrain_std = 0;
-Grad_Axle_std = std([FLGrad, FRGrad]) + std([BLGrad, BRGrad]);
-Grad_Side_std = std([FLGrad, BLGrad]) + std([FRGrad, BRGrad]);
-Hess_Terrain_std = 0;
-Hess_Axle_std = 0;
-Hess_Side_std = 0;
+% % x = [uy r ux dFzlong delta x y yaw]
+% % y-velocity, yaw-dot, x-velocity, longitudinal load transfer, steering
+% % angle, x, y, yaw
+% % u = [deltadot Fxf_enginebrake Fxr]
+% % yaw-dot, engine force, rear braking force
+% % Costs: Terrain_std, Axle_std, Side_std
+% 
+% % Terrain_std = std([FLGrad, FRGrad, BLGrad, BRGrad]);
+% % FLGrad = cos(FWheelYaw) * datamap(FLx, FLy, 2) + sin(FWheelYaw) * datamap(FLx, FLy, 3);
+% dFLGrad_dyaw = -sin(yaw+delta)*datamap(FLx, FLy, 2) + cos(yaw+delta)*datamap(FLx, FLy, 3);
+% dFLGrad_dr = -cos(yaw+delta)*datamap(FLx, FLy, 2) - sin(yaw+delta)*datamap(FLx, FLy, 3);
+% d2FLGrad_dr2 = sin(yaw+delta)*datamap(FLx, FLy, 2) - cos(yaw+delta)*datamap(FLx, FLy, 3);
+% dFLGrad_dx = [0 dFLGrad_dr 0 0 dFLGrad_dyaw 0 0 dFLGrad_dyaw];
+% d2FLGrad_dx2 = [0 d2FLGrad_dr2 0 0 dFLGrad_dr 0 0 dFLGrad_dr];
+% % How does this convert to standard deviation?
+% % std = sqrt((SUM(x - mu))^2 / N)
+% dstd/dx = 
+% dTerrain_std__duy = 0;
+% dTerrain_std__dr = ;
+% 
+% Grad_Terrain_std = 0;
+% Grad_Axle_std = std([FLGrad, FRGrad]) + std([BLGrad, BRGrad]);
+% Grad_Side_std = std([FLGrad, BLGrad]) + std([FRGrad, BRGrad]);
+% Hess_Terrain_std = 0;
+% Hess_Axle_std = 0;
+% Hess_Side_std = 0;
 end
 
 function [FLGrad, FRGrad, BLGrad, BRGrad, FAxleGrad, BAxleGrad, LSideGrad, RSideGrad, FL2BRGrad, FR2BLGrad] = GradCalc(FLWheelT, FRWheelT, BLWheelT, BRWheelT, FWheelYaw, BWheelYaw, terrain_translation, terrain_x_scale, terrain_y_scale)

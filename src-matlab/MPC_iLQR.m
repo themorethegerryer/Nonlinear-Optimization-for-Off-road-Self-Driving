@@ -24,18 +24,18 @@ function [U, X] = MPC_iLQR(XDouble, XrefDouble, U)
     Uref = zeros(nu,N-1);
     
     iter = -1;
-    [d, K, P, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N);
+    [d, K, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N);
     iter = iter + 1;
     while iter < 100 && max(vecnorm(d)) > 1
         [X, U] = forward_pass(model,X,U,Xref,Uref,K,d,del_J,Q,R,Qf,N,dt);
         iter = iter + 1;
-        [d, K, P, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N);
+        [d, K, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N);
         disp(iter)
         disp(max(vecnorm(d)))
     end
 end
 
-function [d, K, P, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N)
+function [d, K, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N)
     nx = length(X(:,1));
     nu = length(U(:,1));
     P = zeros(nx,nx,N);
