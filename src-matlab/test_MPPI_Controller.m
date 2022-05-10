@@ -6,11 +6,11 @@ model = DynamicBicycleModel();
 
 dt = 0.1;
 
-x0 = [0 0 0 0 0 pi/4 0 0 0]';
-Xref = [0.01 0 0.01 0 0 0 2 2 0]';
+x0 = [0 0 0 0 0 0 0 0 0]';
+Xref = [0.01 0 0.01 0 0 0 2 0 0]';
 Uref = [0 0 0]';
 
-N = 1000;
+N = 300;
 n = length(Xref);
 m = length(Uref);
 
@@ -19,11 +19,13 @@ U = zeros(m,N);
 X(:,1) = x0;
 U(:,1) = Uref;
 
+Uhorizon = Uref.*ones(3,25);
+
 for k=1:N-1
     disp(k)
-    U(:,k+1) = MPPI_Controller(X(:,k), Xref, Uref);
+    [U(:,k+1), Uhorizon] = MPPI_Controller(X(:,k), Xref, Uhorizon);
     X(:,k+1) = model.dynamics_rk4(X(:,k)', U(:,k+1)', dt);
-%     [X(6,k+1) X(7,k+1)]
+    [X(6,k+1) X(7,k+1)]
 end
 
 figure(1)
