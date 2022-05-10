@@ -1,8 +1,10 @@
-function [costVector] = CostFunction(FLWheelT, FRWheelT, BLWheelT, BRWheelT, FWheelYaw, BWheelYaw)
+function [costVector] = CostFunction(car, CGx, CGy, CGyaw, delta)
 % Wheel translations in terms of z height
 % Terrain values in terms of y height
 
 % Front wheel yaw is vehicle yaw plus delta (slip angle)
+init_parameters = load('init_parameters');
+datamap = load('TerrainData').data_map;
 
 % Load in terrain parameters
 terrain_x_indices = init_parameters.terrain_x_indices;
@@ -10,6 +12,10 @@ terrain_y_indices = init_parameters.terrain_y_indices;
 terrain_x_scale = init_parameters.terrain_x_scale;
 terrain_y_scale = init_parameters.terrain_y_scale;
 terrain_translation = init_parameters.TerrainTranslation;
+
+[CGT, CGR, FLWheelT, FLWheelR, FRWheelT, FRWheelR, BLWheelT, BLWheelR, BRWheelT, BRWheelR] = TireLocator(CGx, CGy, CGyaw, delta, car.a, car.b, car.df, car.dr, car.hcg, 0.2, 0.3, terrain_x_indices, terrain_y_indices, terrain_x_scale, terrain_y_scale, terrain_translation, datamap);
+BWheelYaw = CGyaw;
+FWheelYaw = CGyaw+delta;
 
 % Grab gradients at tire locations
 % Front Left Wheel

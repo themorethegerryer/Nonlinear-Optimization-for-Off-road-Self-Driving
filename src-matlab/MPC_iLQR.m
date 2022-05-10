@@ -2,30 +2,38 @@
 % x = [x y theta]
 % u = [delta v]
 
-function [X,U,K,P] = MPC_iLQR(x0, U, Xref, Uref, model, N, dt, Q, R, Qf)
-    if nargin < 5
+function [X,U,K,P] = MPC_iLQR(x0, xg, model, N, dt, Q, R, Qf)
+    if nargin < 3
         model = KinematicBicycleModel();
         N = 100;
         dt = 0.1;
         Q = diag([1 1 1]);
         R = diag([0.1 0.1]);
-        Qf = Q*10;
+        Qf = diag([10 10 1]);
     end
     nx = length(x0);
+    nu = 2;
+    
     X = zeros(nx,N);
     X(:,1) = x0;
+    Xref = ones(nx,N).*xg;
+    
+    Uref = zeros(nu,N-1);
+    U = Uref(:,:);
     
     iter = -1;
-    [d, K, P, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N,dt);
+    [d, K, P, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N);
     iter = iter + 1;
-    while iter < 10 && max(vecnorm(d)) > 1e-1
+    while iter < 200 && max(vecnorm(d)) > 6
         [X, U, Jr, alpha] = forward_pass(model,X,U,Xref,Uref,K,d,del_J,Q,R,Qf,N,dt);
         iter = iter + 1;
-        [d, K, P, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N,dt);
+        [d, K, P, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N);
+        disp(iter)
+        disp(max(vecnorm(d)))
     end
 end
 
-function [d, K, P, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N,dt)
+function [d, K, P, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N)
     nx = length(X(:,1));
     nu = length(U(:,1));
     P = zeros(nx,nx,N);
@@ -116,6 +124,6 @@ function [Jxx, Jx, Juu, Ju] = stage_cost_expansion(x,u,xref,uref, Q, R)
 end
 
 function [Jxx, Jx] = term_cost_expansion(x,xref, Qf)
-    Jxx = Qf
-    Jx = Qf*(x-xref)
+    Jxx = Qf;
+    Jx = Qf*(x-xref);
 end
