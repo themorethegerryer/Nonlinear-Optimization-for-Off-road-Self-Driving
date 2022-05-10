@@ -42,23 +42,19 @@ classdef KinematicBicycleModel
         % y: global y position
         % theta: heading (angle from global x-axis)
         %
-        % u = [acc deltadot]
+        % u = [deltadot acc]
         % v: forward velocity of back tire
         % alpha: steering angle
             dxdt = zeros(size(x));
             
             theta = x(3);
-            v = x(4);
-            delta = x(5);
             
-            acc = u(1);
-            deltadot = u(2);
+            delta = u(1);
+            v = u(2);
             
             dxdt(1) = v*cos(theta);
             dxdt(2) = v*sin(theta);
             dxdt(3) = v*tan(delta)/car.L;
-            dxdt(4) = acc;
-            dxdt(5) = deltadot;
         end
         
         function x_next = dynamics_rk4(car,x,u,dt)

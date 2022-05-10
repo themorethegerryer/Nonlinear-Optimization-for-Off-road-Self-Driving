@@ -1,18 +1,18 @@
 % MPC iLQR
-% x = [x y theta v delta]
-% u = [acc deltadot]
+% x = [x y theta]
+% u = [delta v]
 
 % XDouble = [uy r ux dFzlong dFzlat delta xPos yPos yawOrient]
-function [u0, U] = MPC_iLQR(XDouble, XrefDouble, Uref)
-    x0 = [XDouble(7) XDouble(8) XDouble(9) sqrt(XDouble(1)^2+XDouble(3)^2)
-    Xref = ;
+function [u0, U, X] = MPC_iLQR(XDouble, XrefDouble, U)
+    x0 = [XDouble(7) XDouble(8) XDouble(9)]';
+    xg = [XrefDouble(7) XrefDouble(8) XrefDouble(9)]';
 
     model = KinematicBicycleModel();
-    N = 100;
+    N = 26;
     dt = 0.1;
-    Q = diag([10 10 100 1 0.1]);
+    Q = diag([1 1 1]);
     R = diag([1 1]);
-    Qf = diag([100 100 1 1 0.1]);
+    Qf = diag([10 10 1]);
     
     nx = length(x0);
     nu = length(R);
@@ -22,17 +22,15 @@ function [u0, U] = MPC_iLQR(XDouble, XrefDouble, Uref)
     Xref = ones(nx,N).*xg;
     
     Uref = zeros(nu,N-1);
-    U = Uref(:,:);
     
     iter = -1;
     [d, K, P, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N);
     iter = iter + 1;
-    while iter < 5 && max(vecnorm(d)) > 10
+    while iter < 100 && max(vecnorm(d)) > 1e-5
         [X, U] = forward_pass(model,X,U,Xref,Uref,K,d,del_J,Q,R,Qf,N,dt);
         iter = iter + 1;
         [d, K, P, del_J] = backward_pass(model,X,U,Xref,Uref,Q,R,Qf,N);
-        disp(iter)
-        disp(max(vecnorm(d)))
+        disp(iter,max(vecnorm(d)))
     end
     u0 = U(:,1);
 end
