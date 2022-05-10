@@ -7,8 +7,8 @@ clc;
 X_init = [0 0 0 0 pi/4 0 0 0];
 
 % define sample control input
-% u = [deltadot Fxfbrake Fxr Fengine]
-U_init = [0 0 0 10];
+% u = [deltadot Fxf_enginebrake Fxr]
+U_init = [0 10 0];
 
 single_track_car = DynamicBicycleModel();
 

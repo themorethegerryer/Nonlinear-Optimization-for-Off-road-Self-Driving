@@ -44,7 +44,7 @@ classdef DynamicBicycleModel
         % dFzlong: longitudinal load transfer ~ 500 N
         % delta: current steering angle ~ 0.1 rad
         %
-        % u = [deltadot Fxfbrake Fxr Fengine]
+        % u = [deltadot Fxf_enginebrake Fxr]
         % deltadot: change in steering angle ~ 0.1 rad/s
         % Fxfbrake: Front brake force ~ 500 N
         % Fxr: Rear driving force ~ 300 N
@@ -59,9 +59,8 @@ classdef DynamicBicycleModel
             delta = x(5);
 
             deltadot = u(1);
-            Fxfbrake = -u(2);
-            Fxr = -u(3);
-            Fengine = u(4);
+            Fxf_enginebrake = u(2);
+            Fxr = u(3);
 
             % Pre-calcuate variables needed in equations
             p = 0;% roll rate
@@ -174,7 +173,7 @@ classdef DynamicBicycleModel
         
         function Fwheel = tire_model(car, Fz_bundle, x, u) 
             % x = [uy r ux dFzlong delta x y yaw]
-            % u = [deltadot Fxfbrake Fxr Fengine]
+            % u = [deltadot Fxf_enginebrake Fxr]
             % TODO replace Fx with the state of the car
             % computer lateral force Fy
 
@@ -182,9 +181,9 @@ classdef DynamicBicycleModel
             % assume constant open differential
             Fwheel = zeros(1,3);
 
-            torque_engine = u(4);
-            Fxf = torque_engine - u(2);
-            Fxr = -u(3);
+            engine_brake = u(2);
+            Fxf = engine_brake;
+            Fxr = u(3);
 
             Fwheel(1) = Fxf;
             Fwheel(2) = Fxr;
