@@ -31,6 +31,7 @@ for i=1:length(t)
 %     U_init(1) = (rand(1)-0.5)*(pi/2)+U_init_const_steer;
 %     U_init(2) = (rand(1)-0.5)*200+U_init_const_throttle;
     X_n_1 = temp_xVect + single_track_car.continuous_dynamics(temp_xVect, U_init)*dt;
+    X_n_1(5) = 0;
     xVect = [xVect ; X_n_1];
     xpos(i+1) = xpos(i) + X_n_1(3)*dt;
     ypos(i+1) = ypos(i) + X_n_1(1)*dt;

@@ -3,10 +3,10 @@ clear all;
 clc;
 
 % define sample state
-X_init = [0 0 0 0 0 0 0 0 0 0 0];
+X_init = [0 0 0 0 0 0 0 0 0];
 
 % define sample control input
-U_init = [0 0 0 0 0];
+U_init = [0 0 0];
 
 % accelerator between 0 and 70
 % brake between 0 and 150
@@ -30,7 +30,7 @@ t = 0:dt:30;
 U_init_const_steer = 0;
 U_init_const_throttle = 0;
 
-for k=1:5
+for k=1:50
     xVect = [X_init];
     xVect_discrete = [X_init];
     for i=1:length(t)
@@ -42,7 +42,7 @@ for k=1:5
 %             temp_xVect_discrete = xVect_discrete(i,:);
         end
         U_init(1) = (rand(1)-0.5)*(pi/3)+U_init_const_steer;
-        U_init(4) = (rand(1)-0.5)*100+U_init_const_throttle;
+        U_init(2) = (rand(1)-0.5)*100+U_init_const_throttle;
         X_n_1 = double_track_car.dynamics_rk4(temp_xVect, U_init, dt);
         xVect = [xVect ; X_n_1];
 %         jac = double_track_car.discrete_jacobian(temp_xVect_discrete,U_init);
@@ -65,7 +65,7 @@ sizeArr = size(xStore);
 figure()
 hold on
 for i=1:sizeArr(3)
-    plot(xStore(:,9,i),xStore(:,10,i),'-o')
+    plot(xStore(:,7,i),xStore(:,8,i),'-o')
 end
 title('varying random control inputs')
 xlabel('x position')

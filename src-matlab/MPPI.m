@@ -47,7 +47,7 @@ R = diag([0 0 0]);
 % Q = diag([0 0 1 0 0 0 0]);
 % R = diag([0 0 0 0]);
 % xpos ypos yaw
-Qpos = diag([10 10 0]);
+Qpos = diag([1 1 0]);
 
 % Create MPPI Controller
 x_pos = zeros(N,1);
