@@ -3,18 +3,18 @@ clear all;
 clc;
 
 % define sample state
-% x = [uy r ux dFzlong delta x y yaw]
-X_init = [0 0 0 0 pi/2 0 0 0];
+% x = [uy r ux delta x y yaw]
+X_init = [0 0 0 pi/4 0 0 0];
 
 % define sample control input
 % u = [deltadot Fxf_enginebrake Fxr]
-U_init = [0 10 0];
+U_init = [0 100 0];
 
 single_track_car = DynamicBicycleModel();
 
 % step through dynamics 
 dt = 0.01;
-t = 0:dt:45;
+t = 0:dt:15;
 xpos = zeros(size(t));
 ypos = zeros(size(t));
 
@@ -31,7 +31,7 @@ for i=1:length(t)
 %     U_init(1) = (rand(1)-0.5)*(pi/2)+U_init_const_steer;
 %     U_init(2) = (rand(1)-0.5)*200+U_init_const_throttle;
     X_n_1 = temp_xVect + single_track_car.continuous_dynamics(temp_xVect, U_init)*dt;
-    X_n_1(5) = 0;
+%     X_n_1(5) = 0;
     xVect = [xVect ; X_n_1];
     xpos(i+1) = xpos(i) + X_n_1(3)*dt;
     ypos(i+1) = ypos(i) + X_n_1(1)*dt;
@@ -45,7 +45,7 @@ end
 figure()
 hold on
 
-plot(xVect(:,6),xVect(:,7),'-o')
+plot(xVect(:,5),xVect(:,6),'-o')
 
 title('varying random control inputs')
 xlabel('x position')
