@@ -54,7 +54,7 @@ classdef KinematicBicycleModel
             
             dxdt(1) = v*cos(theta);
             dxdt(2) = v*sin(theta);
-            dxdt(3) = v*tan(delta)/car.L;
+            dxdt(3) = v*tan(-delta)/car.L;
         end
         
         function x_next = dynamics_rk4(car,x,u,dt)

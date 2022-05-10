@@ -43,32 +43,32 @@ B_BRWheelH = [B_BRWheelRotm, B_BRWheelT'; 0, 0, 0, 1];
 CGx_indices = (CGx - terrain_translation(1)) / terrain_x_scale;
 CGy_indices = (CGy - terrain_translation(3)) / terrain_y_scale;
 CGz = 0;
-CGx_indices
-CGy_indices
-upper_left_z = data_map(floor(CGx_indices), ceil(CGy_indices), 1)
-lower_right_z = data_map(ceil(CGx_indices), floor(CGy_indices), 1)
+CGx_indices;
+CGy_indices;
+upper_left_z = data_map(floor(CGx_indices), ceil(CGy_indices), 1);
+lower_right_z = data_map(ceil(CGx_indices), floor(CGy_indices), 1);
 if CGx_indices - floor(CGx_indices) + CGy_indices - floor(CGy_indices) <= 1
     % CG is in lower-left half of planar triangle
-    lower_left_z = data_map(floor(CGx_indices), floor(CGy_indices), 1)
-    x_ratio = (1.0 - (CGx_indices - floor(CGx_indices)))
-    y_ratio = (1.0 - (CGy_indices - floor(CGy_indices)))
-    CGz = lower_left_z + x_ratio * (lower_right_z - lower_left_z) + y_ratio * (upper_left_z - lower_left_z)
-    x_angle = atan((lower_right_z - lower_left_z) / terrain_x_scale)
-    y_angle = atan((upper_left_z - lower_left_z) / terrain_y_scale)
+    lower_left_z = data_map(floor(CGx_indices), floor(CGy_indices), 1);
+    x_ratio = (1.0 - (CGx_indices - floor(CGx_indices)));
+    y_ratio = (1.0 - (CGy_indices - floor(CGy_indices)));
+    CGz = lower_left_z + x_ratio * (lower_right_z - lower_left_z) + y_ratio * (upper_left_z - lower_left_z);
+    x_angle = atan((lower_right_z - lower_left_z) / terrain_x_scale);
+    y_angle = atan((upper_left_z - lower_left_z) / terrain_y_scale);
 else
     % CG is in upper-right half of planar triangle
-    upper_right_z = data_map(ceil(CGx_indices), ceil(CGy_indices), 1)
-    x_ratio = ceil(CGx_indices) - CGx_indices
-    y_ratio = ceil(CGy_indices) - CGy_indices
-    CGz = upper_right_z - x_ratio * (upper_right_z - upper_left_z) - y_ratio * (upper_right_z - lower_right_z)
-    x_angle = atan((upper_right_z - upper_left_z) / terrain_x_scale)
-    y_angle = atan((upper_right_z - lower_right_z) / terrain_y_scale)
+    upper_right_z = data_map(ceil(CGx_indices), ceil(CGy_indices), 1);
+    x_ratio = ceil(CGx_indices) - CGx_indices;
+    y_ratio = ceil(CGy_indices) - CGy_indices;
+    CGz = upper_right_z - x_ratio * (upper_right_z - upper_left_z) - y_ratio * (upper_right_z - lower_right_z);
+    x_angle = atan((upper_right_z - upper_left_z) / terrain_x_scale);
+    y_angle = atan((upper_right_z - lower_right_z) / terrain_y_scale);
 end
 B2GT = [CGx, CGy, CGz + tire_radius + CarCGH / 2];
-x_angle
-y_angle
-CGpitch = cos(CGyaw) * x_angle + sin(CGyaw) * y_angle
-CGroll = sin(CGyaw) * x_angle + cos(CGyaw) * y_angle
+x_angle;
+y_angle;
+CGpitch = cos(CGyaw) * x_angle + sin(CGyaw) * y_angle;
+CGroll = sin(CGyaw) * x_angle + cos(CGyaw) * y_angle;
 YawMat = eul2rotm([-CGyaw, 0, 0], 'ZYX');
 Pitchmat = eul2rotm([0, CGpitch, 0], 'ZYX');
 Rollmat = eul2rotm([0, 0, CGroll], 'ZYX');
