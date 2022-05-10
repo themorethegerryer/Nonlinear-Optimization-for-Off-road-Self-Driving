@@ -1,8 +1,11 @@
-function control = MPPI_Controller(X, Xref, Uref)
+function control = MPPI_Controller(XDouble, XrefDouble, Uref)
 % inputs:
 % X: current state of DoubleTrackModel car
 % Xref: reference state of DoubleTrackModel car
 % Uref: reference control input
+
+    X = [XDouble(1:4) ; XDouble(6:9)];
+    Xref = [XrefDouble(1:4) ; XrefDouble(6:9)];
 
     % define DynamicBicycleModel car
     model = DynamicBicycleModel();
@@ -18,7 +21,7 @@ function control = MPPI_Controller(X, Xref, Uref)
     umin = [-0.1, -200, 0]';
     umax = [0.1, 200, 0]';
     
-    Q = diag([0 0 0 0 0 1 1  0]);
+    Q = diag([0 0 0 0 0 1 1 0]);
     R = diag([0 0 0]);
     
     x_rollout = zeros(n,Nh);
