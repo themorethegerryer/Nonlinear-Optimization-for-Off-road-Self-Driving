@@ -39,6 +39,7 @@ FR2BLGrad = abs(norm(FRWheelT(1:2) - BLWheelT(1:2)) / (FRWheelT(3) - BLWheelT(3)
 
 %costVector = [FLGrad, FRGrad, BLGrad, BRGrad, FAxleGrad, BAxleGrad, LSideGrad, RSideGrad];
 Terrain_std = std([FLGrad, FRGrad, BLGrad, BRGrad]);
-Axle_std = std([FAxleGrad, BAxleGrad, LSideGrad, RSideGrad]);
-costVector = [Terrain_std, Axle_std];
+Axle_std = std([FAxleGrad, BAxleGrad]);
+Side_std = std([LSideGrad, RSideGrad]);
+costVector = [Terrain_std, Axle_std, Side_std];
 end
