@@ -24,8 +24,13 @@ function control = MPPI_Controller(X, Xref, Uref)
     x_rollout = zeros(n,Nh);
     x_rollout(:,1) = X;
     costs = zeros(num_samples,1);
+
+%     u_start = Uref.*ones(m,Nh);
+    u_start = ones(m,Nh);
     
-    u_start = Uref.*ones(m,Nh);
+    for i=1:m
+        u_start(i,Nh) = ones(i,Nh) * Uref(i);
+    end
     
     u_perturb = zeros(m,Nh,num_samples);
     u_perturb(1,:,:) = ((umax(1)-umin(1)).*rand(num_samples,Nh)+umin(1))';
