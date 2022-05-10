@@ -37,24 +37,28 @@ classdef KinematicBicycleModel
         end
         
         function dxdt = continuous_dynamics(car, x, u)% ax, ay, rdot, wdot
-        % x = [x y theta]
+        % x = [x y theta v delta]
         % x: global x position
         % y: global y position
         % theta: heading (angle from global x-axis)
         %
-        % u = [v alpha]
+        % u = [acc deltadot]
         % v: forward velocity of back tire
         % alpha: steering angle
             dxdt = zeros(size(x));
             
             theta = x(3);
+            v = x(4);
+            delta = x(5);
             
-            v = u(1);
-            alpha = u(2);
+            acc = u(1);
+            deltadot = u(2);
             
             dxdt(1) = v*cos(theta);
             dxdt(2) = v*sin(theta);
-            dxdt(3) = v*tan(alpha)/car.L;
+            dxdt(3) = v*tan(delta)/car.L;
+            dxdt(4) = acc;
+            dxdt(5) = deltadot;
         end
         
         function x_next = dynamics_rk4(car,x,u,dt)
