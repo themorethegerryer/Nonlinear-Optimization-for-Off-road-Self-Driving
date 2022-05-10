@@ -4,11 +4,11 @@ function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
 % Xref: reference state of DoubleTrackModel car
 % Uref: reference control input
 
-    X = [XDouble(1:3) ; XDouble(6:9)];
-    Xref = [XrefDouble(1:3) ; XrefDouble(6:9)];
+%     X = [XDouble(1:3) ; XDouble(6:9)];
+%     Xref = [XrefDouble(1:3) ; XrefDouble(6:9)];
 
-%     X = XDouble(7:9);
-%     Xref = XrefDouble(7:9);
+    X = XDouble(7:9);
+    Xref = XrefDouble(7:9);
 
 %     X = XDouble;
 %     Xref = XrefDouble;
