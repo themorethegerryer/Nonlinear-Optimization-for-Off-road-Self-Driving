@@ -2,6 +2,7 @@ function [costVector] = CostFunction(car, CGx, CGy, CGyaw, delta)
 % Wheel translations in terms of z height
 % Terrain values in terms of y height
 
+% Front wheel yaw is vehicle yaw plus delta (slip angle)
 init_parameters = load('init_parameters');
 datamap = load('TerrainData').data_map;
 
@@ -47,4 +48,6 @@ Terrain_std = std([FLGrad, FRGrad, BLGrad, BRGrad]);
 Axle_std = std([FAxleGrad, BAxleGrad]);
 Side_std = std([LSideGrad, RSideGrad]);
 costVector = [Terrain_std, Axle_std, Side_std];
+
+Grad_Terrain_std = 0;
 end
