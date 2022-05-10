@@ -31,7 +31,7 @@ classdef KinematicBicycleModel
     end
     
     methods
-        function car = SingleTrackModel()
+        function car = KinematicBicycleModel()
             % Single Track Model Constructor
             car.L = car.a + car.b; % vehicle's wheelbase
         end
@@ -46,7 +46,9 @@ classdef KinematicBicycleModel
         % v: forward velocity of back tire
         % alpha: steering angle
             dxdt = zeros(size(x));
-
+            
+            theta = x(3);
+            
             v = u(1);
             alpha = u(2);
             
