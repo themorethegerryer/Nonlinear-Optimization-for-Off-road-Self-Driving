@@ -7,7 +7,7 @@ model = KinematicBicycleModel();
 dt = 0.1;
 
 x0 = [0 0 0]';
-Xref = [20 20 0]';
+Xref = [0 20 0]';
 x0(end) = atan2(Xref(2), Xref(1));
 Uref = [0 0]';
 
@@ -20,7 +20,7 @@ U = zeros(m,N);
 X(:,1) = x0;
 U(:,1) = Uref;
 
-Uhorizon = Uref.*ones(m,25);
+Uhorizon = Uref.*ones(m,30);
 
 for k=1:N-1
     disp(k)
