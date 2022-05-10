@@ -5,6 +5,7 @@ __pycache__/
 
 # Matlab
 src-matlab/slprj/*
+*.asv
 
 # C extensions
 *.so
