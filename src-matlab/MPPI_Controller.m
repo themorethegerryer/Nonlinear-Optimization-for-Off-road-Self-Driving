@@ -29,7 +29,7 @@ function control = MPPI_Controller(X, Xref, Uref)
     u_start = ones(m,Nh);
     
     for i=1:m
-        u_start(i,Nh) = ones(i,Nh) * Uref(i);
+        u_start(i,:) = u_start(i,:) * Uref(i);
     end
     
     u_perturb = zeros(m,Nh,num_samples);
