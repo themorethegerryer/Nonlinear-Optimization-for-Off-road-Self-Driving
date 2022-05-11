@@ -94,7 +94,8 @@ CGR = rotm2axang(B2GR);
 % Send roll and pitch information
 DpitchDyaw = -sin(CGyaw) * x_angle + cos(CGyaw) * y_angle;
 DrollDyaw = cos(CGyaw) * x_angle - sin(CGyaw) * y_angle;
-State3d = [CGpitch, CGroll, DpitchDyaw, DrollDyaw];
+State3d = [-CGpitch; CGroll; -DpitchDyaw; DrollDyaw];
+
 % Tires in global frame
 % Front left wheel
 G_FLWheelH = B2GH * B_FLWheelH;

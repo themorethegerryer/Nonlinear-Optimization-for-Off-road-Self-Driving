@@ -113,8 +113,9 @@ Terrain_node.translation = [-terrain_x_indices/2*terrain_x_scale, 0, -terrain_y_
 
 % Create goal object
 Goal_node = vrnode(myworld, 'Goal');
-Goal_shape = vrnode(myworld, 'Goal_Shape');
+Goal_shape = vrnode(myworld, 'Goal_shape');
 Goal_geo = vrnode(Goal_shape, 'geometry', 'Goal_Geometry','Cylinder');
+Goal_geo.height = 30;
 goal_x = 0;
 goal_y = 0;
 Goal_node.translation = [goal_x, 0, goal_y];
