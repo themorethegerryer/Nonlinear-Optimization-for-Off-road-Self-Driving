@@ -4,6 +4,7 @@ function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
 % Xref: reference state of DoubleTrackModel car
 % Uref: reference control input
 
+    % input: 9-long state -> output: 7-long state
 %     X = [XDouble(1:3) ; XDouble(6:9)];
 %     Xref = [XrefDouble(1:3) ; XrefDouble(6:9)];
 
@@ -17,10 +18,11 @@ function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
     model = KinematicBicycleModel();
     
     % define hyperparameters
-    Nh = 30; %Rollout Horizon
+    [m, cols] = size(Uref);
+    Nh = cols; %Rollout Horizon
     dt = 0.1;
     n = length(Xref);
-    [m, cols] = size(Uref);
+    
 %     m = length(Uref);
     gamma = 0.1; % discount factor
     num_samples = 800; % Number of sampled trajectories
@@ -69,7 +71,9 @@ function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
 %     u_start = ones(m,Nh);
 %     
 %     for i=1:m
-%         u_start(i,:) = u_start(i,:) * Uref(i);
+%         for j=1:cols
+%             u_start(i,j) = u_start(i,j) * Uref(i,j);
+%         end
 %     end
     
     u_perturb = zeros(m,Nh,num_samples);
@@ -102,7 +106,7 @@ function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
         weighted_traj(:,:,uk) = weight*u_perturb(:,:,uk);
     end
 
-    [mean(costs)]
+%     [mean(costs)]
     control_Nh = u_start+(sum(weighted_traj,3)/sum_weights);
     control = control_Nh(:,1);
 %     control = mean(control_Nh,2);
