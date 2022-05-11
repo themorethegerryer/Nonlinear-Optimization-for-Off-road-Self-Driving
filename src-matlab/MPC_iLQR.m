@@ -11,7 +11,7 @@ function [u0,U,X] = MPC_iLQR(XDouble, XrefDouble, U)
     N = length(U)+1;
     dt = 0.1;
     Q = diag([1 1 1]);
-    R = diag([1 2]);
+    R = diag([1 1]);
     Qf = diag([1 1 1]);
     
     nx = length(x0);
@@ -82,6 +82,7 @@ function [Xn, Un] = forward_pass(model,X,U,Xref,Uref,K,d,del_J,Q,R,Qf,N,dt)
 
     for k = 1:(N-1)
         Un(:,k) = U(:,k) - alpha*d(:,k) - K(:,:,k)*(Xn(:,k)-X(:,k));
+%         Un(:,k) = clamp_steering(Un(:,k));
         Xn(:,k+1) = model.dynamics_rk4(Xn(:,k),Un(:,k),dt);
     end
     Jn = trajectory_cost(model,Xn,Un,Xref,Uref,Q,R,Qf);
@@ -92,6 +93,7 @@ function [Xn, Un] = forward_pass(model,X,U,Xref,Uref,K,d,del_J,Q,R,Qf,N,dt)
         alpha = 0.5*alpha;
         for k = 1:(N-1)
             Un(:,k) = U(:,k) - alpha*d(:,k) - K(:,:,k)*(Xn(:,k)-X(:,k));
+%             Un(:,k) = clamp_steering(Un(:,k));
             Xn(:,k+1) = model.dynamics_rk4(Xn(:,k),Un(:,k),dt);
         end
         Jn = trajectory_cost(model,Xn,Un,Xref,Uref,Q,R,Qf);
@@ -130,4 +132,8 @@ end
 function [Jxx, Jx] = term_cost_expansion(x,xref, Qf)
     Jxx = Qf;
     Jx = Qf*(x-xref);
+end
+
+function Uout = clamp_steering(Uin)
+    Uout = [max(-pi/4, min(pi/4, Uin(1))), Uin(2)]';
 end

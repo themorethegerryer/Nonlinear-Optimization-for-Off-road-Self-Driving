@@ -1,9 +1,9 @@
-function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
+function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble)
 % inputs:
 % X: current state of DoubleTrackModel car
 % Xref: reference state of DoubleTrackModel car
 % Uref: reference control input
-
+    Uref = zeros(2,30);
     % input: 9-long state -> output: 7-long state
 %     X = [XDouble(1:3) ; XDouble(6:9)];
 %     Xref = [XrefDouble(1:3) ; XrefDouble(6:9)];
