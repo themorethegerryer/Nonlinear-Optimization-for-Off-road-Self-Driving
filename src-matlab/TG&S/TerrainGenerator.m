@@ -111,6 +111,14 @@ Zscaled = height_vector .* (size(cmap,1)-1) ./ max(height_vector);
 Terrain_node.translation = [-terrain_x_indices/2*terrain_x_scale, 0, -terrain_y_indices/2*terrain_y_scale];
 % Update view?
 
+% Create goal object
+Goal_node = vrnode(myworld, 'Goal');
+Goal_shape = vrnode(myworld, 'Goal_Shape');
+Goal_geo = vrnode(Goal_shape, 'geometry', 'Goal_Geometry','Cylinder');
+goal_x = 0;
+goal_y = 0;
+Goal_node.translation = [goal_x, 0, goal_y];
+
 % Update Car
 % Body
 CarBody_node.translation = [-terrain_x_indices/2*terrain_x_scale+car_length/2+tire_radius, car_elevation+0.5*car_height, -terrain_y_indices/2*terrain_y_scale+0.5*car_width+0.5*tire_width];
