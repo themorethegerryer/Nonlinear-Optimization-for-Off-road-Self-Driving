@@ -1,4 +1,4 @@
-function [CGT, CGR, FLWheelT, FLWheelR, FRWheelT, FRWheelR, BLWheelT, BLWheelR, BRWheelT, BRWheelR] = TireLocator(CGx, CGy, CGyaw, delta, CarA, CarB, CarDf, CarDr, CarCGH, tire_width, tire_radius, terrain_x_indices, terrain_y_indices, terrain_x_scale, terrain_y_scale, terrain_translation, data_map)
+function [State3d, CGT, CGR, FLWheelT, FLWheelR, FRWheelT, FRWheelR, BLWheelT, BLWheelR, BRWheelT, BRWheelR] = TireLocator(CGx, CGy, CGyaw, delta, CarA, CarB, CarDf, CarDr, CarCGH, tire_width, tire_radius, terrain_x_indices, terrain_y_indices, terrain_x_scale, terrain_y_scale, terrain_translation, data_map)
 % T: x, y, z
 % R: x, y, z, w
 % All variables in terms of "normal" axes (z: height) EXCEPT for
@@ -91,6 +91,10 @@ Rollmat = eul2rotm([0, 0, -CGroll], 'ZYX');
 B2GR = Rollmat * Pitchmat * YawMat;
 CGR = rotm2axang(B2GR);
 
+% Send roll and pitch information
+DpitchDyaw = -sin(CGyaw) * x_angle + cos(CGyaw) * y_angle;
+DrollDyaw = cos(CGyaw) * x_angle - sin(CGyaw) * y_angle;
+State3d = [CGpitch, CGroll, DpitchDyaw, DrollDyaw];
 % Tires in global frame
 % Front left wheel
 G_FLWheelH = B2GH * B_FLWheelH;

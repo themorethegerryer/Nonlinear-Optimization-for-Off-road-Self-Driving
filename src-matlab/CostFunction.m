@@ -22,7 +22,7 @@ terrain_x_scale = init_parameters.terrain_x_scale;
 terrain_y_scale = init_parameters.terrain_y_scale;
 terrain_translation = init_parameters.TerrainTranslation;
 
-[CGT, CGR, FLWheelT, FLWheelR, FRWheelT, FRWheelR, BLWheelT, BLWheelR, BRWheelT, BRWheelR] = TireLocator(CGx, CGy, CGyaw, delta, car.a, car.b, car.df, car.dr, car.hcg, 0.2, 0.3, terrain_x_indices, terrain_y_indices, terrain_x_scale, terrain_y_scale, terrain_translation, datamap);
+[State3d, CGT, CGR, FLWheelT, FLWheelR, FRWheelT, FRWheelR, BLWheelT, BLWheelR, BRWheelT, BRWheelR] = TireLocator(CGx, CGy, CGyaw, delta, car.a, car.b, car.df, car.dr, car.hcg, 0.2, 0.3, terrain_x_indices, terrain_y_indices, terrain_x_scale, terrain_y_scale, terrain_translation, datamap);
 BWheelYaw = CGyaw;
 FWheelYaw = CGyaw+delta;
 
@@ -79,7 +79,7 @@ for jj=1:2
         CGx = temp_x0(7);
         CGy = temp_x0(8);
         CGyaw = temp_x0(9);
-        [CGT, CGR, FLWheelT, FLWheelR, FRWheelT, FRWheelR, BLWheelT, BLWheelR, BRWheelT, BRWheelR] = TireLocator(CGx, CGy, CGyaw, delta, car.a, car.b, car.df, car.dr, car.hcg, 0.2, 0.3, terrain_x_indices, terrain_y_indices, terrain_x_scale, terrain_y_scale, terrain_translation, datamap);
+        [State3d, CGT, CGR, FLWheelT, FLWheelR, FRWheelT, FRWheelR, BLWheelT, BLWheelR, BRWheelT, BRWheelR] = TireLocator(CGx, CGy, CGyaw, delta, car.a, car.b, car.df, car.dr, car.hcg, 0.2, 0.3, terrain_x_indices, terrain_y_indices, terrain_x_scale, terrain_y_scale, terrain_translation, datamap);
         BWheelYaw = CGyaw;
         FWheelYaw = CGyaw+delta;
         % Calculate the stepped gradients
