@@ -43,7 +43,7 @@ classdef DoubleTrackModel
 %             load("Terrain Generation and Simulation/TerrainData.mat");
         end
         
-        function dxdt = continuous_dynamics(car, x, u, ppitch, qroll, p, q)% ax, ay, rdot, wdot
+        function dxdt = continuous_dynamics(car, x, u, ppitch, qroll, pdyaw, qdyaw)% ax, ay, rdot, wdot
         % x = [uy r ux dFzlong dFzlat delta xPos yPos yawOrient]
         % uy: vehicle's lateral velocity ~ 1 m/s
         % r: yaw rate ~ 0.1 rad/s
@@ -79,9 +79,9 @@ classdef DoubleTrackModel
             % Pre-calcuate variables needed in equations
             % given the interaction between the car and the environment
             % TODO assume values are zero for now
-%             p = 0;% roll rate
+            p = pdyaw*r;% roll rate
             pdot = 0; % roll acceleration
-%             q = 0;% pitch rate
+            q = qdyaw*r;% pitch rate
             qdot = 0; % pitch acceleration
             uz = 0;% vertical velocity
             k = 0; % curvature describing how path tangent roates about the normal to the road surface with distance traveled along the path - Page 3
