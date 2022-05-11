@@ -43,7 +43,7 @@ classdef DoubleTrackModel
 %             load("Terrain Generation and Simulation/TerrainData.mat");
         end
         
-        function dxdt = continuous_dynamics(car, x, u)% ax, ay, rdot, wdot
+        function dxdt = continuous_dynamics(car, x, u, ppitch, qroll, p, q)% ax, ay, rdot, wdot
         % x = [uy r ux dFzlong dFzlat delta xPos yPos yawOrient]
         % uy: vehicle's lateral velocity ~ 1 m/s
         % r: yaw rate ~ 0.1 rad/s
@@ -79,17 +79,24 @@ classdef DoubleTrackModel
             % Pre-calcuate variables needed in equations
             % given the interaction between the car and the environment
             % TODO assume values are zero for now
-            p = 0;% roll rate
+%             p = 0;% roll rate
             pdot = 0; % roll acceleration
-            q = 0;% pitch rate
+%             q = 0;% pitch rate
             qdot = 0; % pitch acceleration
             uz = 0;% vertical velocity
-            k = 1; % curvature describing how path tangent roates about the normal to the road surface with distance traveled along the path - Page 3
+            k = 0; % curvature describing how path tangent roates about the normal to the road surface with distance traveled along the path - Page 3
     
             % g = g_x*b_x + g_y*b_y + g_z*b_z, gravity in the body frame
-            gx = 0;
-            gy = 0;
-            gz = -9.81;
+
+            pitchRotMat = [cos(ppitch) 0 sin(ppitch) ; 0 1 0 ; -sin(ppitch) 0 cos(ppitch)];
+            rollRotMat = [1 0 0 ; 0 cos(qroll) -sin(qroll) ; 0 sin(qroll) cos(qroll)];
+
+            gVect = [0 ; 0 ; 9.81];
+            gVect = rollRotMat*pitchRotMat*gVect;
+
+            gx = gVect(1);
+            gy = gVect(2);
+            gz = gVect(3);
 
             Fxfl_enginebrake = Fxf_enginebrake/2; % Fxflbrake
             Fxfr_enginebrake = Fxf_enginebrake/2; % Fxfrbrake
@@ -153,18 +160,24 @@ classdef DoubleTrackModel
 
         end
         
-        function x_next = dynamics_rk4(car,x,u,dt)
+        function x_next = dynamics_rk4(car,x,u,dt,ppitch,qroll,p,q)
             % x = [uy r ux dFzlong dFzlat delta xPos yPos yawOrient]
             % u = [deltadot Fxf_enginebrake Fxr]
+            if nargin<8
+                ppitch = 0;
+                qroll = 0;
+                p = 0;
+                q = 0;
+            end
             uTemp = u;
 %             uTemp(1) = uTemp(1) + 0.1*timeVal;
 %             if mod(timeVal,3) == 0
 %                uTemp(1) = -1 * uTemp(1); 
 %             end
-            f1 = continuous_dynamics(car, x, uTemp);
-            f2 = continuous_dynamics(car, x + 0.5*dt*f1, uTemp);
-            f3 = continuous_dynamics(car, x + 0.5*dt*f2, uTemp);
-            f4 = continuous_dynamics(car, x + dt*f3, uTemp);
+            f1 = continuous_dynamics(car, x, uTemp,ppitch,qroll,p,q);
+            f2 = continuous_dynamics(car, x + 0.5*dt*f1, uTemp,ppitch,qroll,p,q);
+            f3 = continuous_dynamics(car, x + 0.5*dt*f2, uTemp,ppitch,qroll,p,q);
+            f4 = continuous_dynamics(car, x + dt*f3, uTemp,ppitch,qroll,p,q);
             
             x_next = x + (dt / 6)*(f1 + 2*f2 + 2*f3 + f4);
             x_next(isnan(x_next)) = 0;

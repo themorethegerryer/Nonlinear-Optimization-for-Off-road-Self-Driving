@@ -106,7 +106,7 @@ function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
         weighted_traj(:,:,uk) = weight*u_perturb(:,:,uk);
     end
 
-    [mean(costs)]
+%     [mean(costs)]
     control_Nh = u_start+(sum(weighted_traj,3)/sum_weights);
     control = control_Nh(:,1);
 %     control = mean(control_Nh,2);

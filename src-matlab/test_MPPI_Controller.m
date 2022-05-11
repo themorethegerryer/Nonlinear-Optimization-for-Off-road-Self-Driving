@@ -27,7 +27,7 @@ for k=1:N-1
     [U(:,k+1), Uhorizon] = MPPI_Controller(X(:,k), Xref, Uhorizon);
     x_kinBicycle = model.dynamics_rk4(X(7:9,k)', U(:,k+1)', dt);
     X(7:9,k+1) = x_kinBicycle;
-    [X(7,k+1) X(8,k+1) U(1,k+1)]
+%     [X(7,k+1) X(8,k+1) U(1,k+1)]
 end
 
 figure(1)

@@ -4,12 +4,12 @@ clc;
 
 % define sample state
 % x = [uy r ux dPsi e dFzlong dFzlat delta xPos yPos yawOrient]
-X_init = [10, ... % uy
+X_init = [0, ... % uy
     0, ... % rdot 
-    27, ... % ux
+    10, ... % ux
     0, ... % dFzlong
     0, ... % dFzlat
-    pi/2, ... % delta
+    0, ... % delta
     0, ... % x-position
     0, ... % y-position
     0]; % rb
@@ -17,7 +17,7 @@ X_init = [10, ... % uy
 % define sample control input
 % u = [deltadot Fxfbrake Fxr Fengine udiff]
 U_init = [0, ... % deltadot
-    -10000, ... % Fxf_enginebrake
+    10, ... % Fxf_enginebrake
     0]; % Fxr
 
 double_track_car = DoubleTrackModel();
@@ -28,6 +28,10 @@ t = 0:dt:45;
 
 xVect = [X_init];
 xVect_discrete = [X_init];
+ppitch = 0; % pitch rate positive when tipping down
+qroll = -0.1;
+p = 0;
+q = 0;
 for i=1:length(t)
 %     i
     if i == 1
@@ -39,7 +43,7 @@ for i=1:length(t)
     end
 %     U_init(1) = (rand(1)-0.5)*(pi/2)+U_init_const_steer;
 %     U_init(2) = (rand(1)-0.5)*200+U_init_const_throttle;
-    X_n_1 = double_track_car.dynamics_rk4(temp_xVect, U_init, dt);
+    X_n_1 = double_track_car.dynamics_rk4(temp_xVect, U_init, dt, ppitch, qroll, p, q);
     xVect = [xVect ; X_n_1];
 %     jac = double_track_car.discrete_jacobian(temp_xVect_discrete,U_init);
 %     X_n_1_discrete = jac.A*temp_xVect_discrete' + jac.B*U_init';
