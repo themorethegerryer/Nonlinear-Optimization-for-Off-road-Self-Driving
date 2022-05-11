@@ -49,7 +49,7 @@ classdef KinematicBicycleModel
             
             theta = x(3);
             
-            delta = u(1);
+            delta = max(-pi/4, min(pi/4, u(1)));
             v = u(2);
             
             dxdt(1) = v*cos(theta);

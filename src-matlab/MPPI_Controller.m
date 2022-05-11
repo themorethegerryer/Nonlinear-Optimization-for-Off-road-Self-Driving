@@ -27,8 +27,8 @@ function [control, control_Nh] = MPPI_Controller(XDouble, XrefDouble, Uref)
     gamma = 0.1; % discount factor
     num_samples = 800; % Number of sampled trajectories
     
-    umin = [-0.2, -20]';
-    umax = [0.2, 20]';
+    umin = [-pi/4, -20]';
+    umax = [pi/4, 20]';
     
     Q = diag([1 1 0]);
     R = diag([0 0]);

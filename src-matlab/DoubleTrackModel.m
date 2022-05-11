@@ -67,7 +67,7 @@ classdef DoubleTrackModel
             ux = x(3);
             dFzlong = x(4);
             dFzlat = x(5);
-            delta = x(6);
+            delta = max(-pi/4, min(pi/4, x(6)));
     
             deltadot = u(1);
             Fxf_enginebrake = u(2);
